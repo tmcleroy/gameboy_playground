@@ -274,14 +274,10 @@ void run()
 
 void main()
 {
-  /* Initialize sprite palette */
-  OBP1_REG = 0xE0U;
-
   SPRITES_8x16;
 
   set_paddle();
   set_ball(1);
   set_lives();
   run();
-  
 }
