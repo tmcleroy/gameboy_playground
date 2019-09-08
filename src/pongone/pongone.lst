@@ -1,0 +1,2325 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : FreeWare ANSI-C Compiler
+                              3 ; Version 2.3.1 Sat Sep  7 20:21:35 2019
+                              4 
+                              5 ;--------------------------------------------------------
+                              6 	.module lcc133230
+                              7 	
+                              8 ;--------------------------------------------------------
+                              9 ; Public variables in this module
+                             10 ;--------------------------------------------------------
+                             11 	.globl _main
+                             12 	.globl _run
+                             13 	.globl _score
+                             14 	.globl _move
+                             15 	.globl _collide
+                             16 	.globl _physics
+                             17 	.globl _input
+                             18 	.globl _set_lives
+                             19 	.globl _set_ball
+                             20 	.globl _set_paddle
+                             21 	.globl _ball_vel_y
+                             22 	.globl _ball_vel_x
+                             23 	.globl _ball_y
+                             24 	.globl _ball_x
+                             25 	.globl _paddle_vel_y
+                             26 	.globl _paddle_vel_x
+                             27 	.globl _paddle_y
+                             28 	.globl _paddle_x
+                             29 	.globl _game_over
+                             30 	.globl _game_started
+                             31 	.globl _lives
+                             32 	.globl _key
+                             33 	.globl _SPRITE_SIZE
+                             34 	.globl _SCREEN_HEIGHT
+                             35 	.globl _SCREEN_WIDTH
+                             36 	.globl _lives_sprite_begin
+                             37 	.globl _ball_sprite_right
+                             38 	.globl _ball_sprite_left
+                             39 	.globl _paddle_speed
+                             40 	.globl _paddle_sprite_right
+                             41 	.globl _paddle_sprite_left
+                             42 	.globl _INITIAL_LIVES
+                             43 	.globl _block_sprite_data
+                             44 	.globl _death_sprite_data
+                             45 	.globl _smile_sprite_data
+                             46 	.globl _ball_sprite_data
+                             47 	.globl _paddle_sprite_data
+                             48 ;--------------------------------------------------------
+                             49 ; special function registers
+                             50 ;--------------------------------------------------------
+                             51 ;--------------------------------------------------------
+                             52 ; special function bits 
+                             53 ;--------------------------------------------------------
+                             54 ;--------------------------------------------------------
+                             55 ; internal ram data
+                             56 ;--------------------------------------------------------
+                             57 	.area _DATA
+   0000                      58 _SCREEN_WIDTH::
+   0000                      59 	.ds 2
+   0002                      60 _SCREEN_HEIGHT::
+   0002                      61 	.ds 2
+   0004                      62 _SPRITE_SIZE::
+   0004                      63 	.ds 2
+   0006                      64 _key::
+   0006                      65 	.ds 1
+   0007                      66 _lives::
+   0007                      67 	.ds 2
+   0009                      68 _game_started::
+   0009                      69 	.ds 2
+   000B                      70 _game_over::
+   000B                      71 	.ds 2
+   000D                      72 _paddle_x::
+   000D                      73 	.ds 1
+   000E                      74 _paddle_y::
+   000E                      75 	.ds 1
+   000F                      76 _paddle_vel_x::
+   000F                      77 	.ds 1
+   0010                      78 _paddle_vel_y::
+   0010                      79 	.ds 1
+   0011                      80 _ball_x::
+   0011                      81 	.ds 1
+   0012                      82 _ball_y::
+   0012                      83 	.ds 1
+   0013                      84 _ball_vel_x::
+   0013                      85 	.ds 1
+   0014                      86 _ball_vel_y::
+   0014                      87 	.ds 1
+                             88 ;--------------------------------------------------------
+                             89 ; overlayable items in internal ram 
+                             90 ;--------------------------------------------------------
+                             91 	.area _OVERLAY
+                             92 ;--------------------------------------------------------
+                             93 ; indirectly addressable internal ram data
+                             94 ;--------------------------------------------------------
+                             95 	.area _ISEG
+                             96 ;--------------------------------------------------------
+                             97 ; bit data
+                             98 ;--------------------------------------------------------
+                             99 	.area _BSEG
+                            100 ;--------------------------------------------------------
+                            101 ; external ram data
+                            102 ;--------------------------------------------------------
+                            103 	.area _XSEG
+                            104 ;--------------------------------------------------------
+                            105 ; global & static initialisations
+                            106 ;--------------------------------------------------------
+                            107 	.area _GSINIT
+                            108 	.area _GSFINAL
+                            109 	.area _GSINIT
+                            110 ;	pongone.c 65
+                            111 ;	genAssign
+                            112 ;	AOP_HL for _SCREEN_WIDTH
+   0000 21 00 00            113 	ld	hl,#_SCREEN_WIDTH
+   0003 36 A0               114 	ld	(hl),#0xA0
+   0005 23                  115 	inc	hl
+   0006 36 00               116 	ld	(hl),#0x00
+                            117 ;	pongone.c 66
+                            118 ;	genAssign
+                            119 ;	AOP_HL for _SCREEN_HEIGHT
+   0008 21 02 00            120 	ld	hl,#_SCREEN_HEIGHT
+   000B 36 90               121 	ld	(hl),#0x90
+   000D 23                  122 	inc	hl
+   000E 36 00               123 	ld	(hl),#0x00
+                            124 ;	pongone.c 67
+                            125 ;	genAssign
+                            126 ;	AOP_HL for _SPRITE_SIZE
+   0010 21 04 00            127 	ld	hl,#_SPRITE_SIZE
+   0013 36 10               128 	ld	(hl),#0x10
+   0015 23                  129 	inc	hl
+   0016 36 00               130 	ld	(hl),#0x00
+                            131 ;	pongone.c 71
+                            132 ;	genAssign
+                            133 ;	AOP_HL for _INITIAL_LIVES
+                            134 ;	AOP_HL for _lives
+   0018 21 CC 01            135 	ld	hl,#_INITIAL_LIVES
+   001B 2A                  136 	ld	a,(hl+)
+   001C 5E                  137 	ld	e,(hl)
+   001D 21 07 00            138 	ld	hl,#_lives
+   0020 22                  139 	ld	(hl+),a
+   0021 73                  140 	ld	(hl),e
+                            141 ;	pongone.c 72
+                            142 ;	genAssign
+                            143 ;	AOP_HL for _game_started
+   0022 21 09 00            144 	ld	hl,#_game_started
+   0025 36 00               145 	ld	(hl),#0x00
+   0027 23                  146 	inc	hl
+   0028 36 00               147 	ld	(hl),#0x00
+                            148 ;	pongone.c 73
+                            149 ;	genAssign
+                            150 ;	AOP_HL for _game_over
+   002A 21 0B 00            151 	ld	hl,#_game_over
+   002D 36 00               152 	ld	(hl),#0x00
+   002F 23                  153 	inc	hl
+   0030 36 00               154 	ld	(hl),#0x00
+                            155 ;--------------------------------------------------------
+                            156 ; Home
+                            157 ;--------------------------------------------------------
+                            158 	.area _HOME
+                            159 	.area _CODE
+                            160 ;--------------------------------------------------------
+                            161 ; code
+                            162 ;--------------------------------------------------------
+                            163 	.area _CODE
+                            164 ;	pongone.c 92
+                            165 ;	genLabel
+                            166 ;	genFunction
+                            167 ;	---------------------------------
+                            168 ; Function set_paddle
+                            169 ; ---------------------------------
+   0000                     170 ___set_paddle_start:
+   0000                     171 _set_paddle:
+   0000 E8 FE               172 	lda	sp,-2(sp)
+                            173 ;	pongone.c 94
+                            174 ;	genRightShift
+                            175 ;	AOP_HL for _SCREEN_WIDTH
+   0002 21 00 00            176 	ld	hl,#_SCREEN_WIDTH
+   0005 4E                  177 	ld	c,(hl)
+   0006 23                  178 	inc	hl
+   0007 46                  179 	ld	b,(hl)
+   0008 CB 28               180 	sra	b
+   000A CB 19               181 	rr	c
+                            182 ;	genCast
+                            183 ;	AOP_HL for _paddle_x
+   000C 21 0D 00            184 	ld	hl,#_paddle_x
+   000F 71                  185 	ld	(hl),c
+                            186 ;	pongone.c 95
+                            187 ;	genMinus
+                            188 ;	AOP_HL for _SCREEN_HEIGHT
+   0010 21 02 00            189 	ld	hl,#_SCREEN_HEIGHT
+   0013 4E                  190 	ld	c,(hl)
+   0014 23                  191 	inc	hl
+   0015 46                  192 	ld	b,(hl)
+   0016 0B                  193 	dec	bc
+                            194 ;	genCast
+                            195 ;	AOP_HL for _paddle_y
+   0017 21 0E 00            196 	ld	hl,#_paddle_y
+   001A 71                  197 	ld	(hl),c
+                            198 ;	pongone.c 97
+                            199 ;	genIpush
+                            200 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+   001B 21 8C 00            201 	ld	hl,#_paddle_sprite_data
+   001E E5                  202 	push	hl
+                            203 ;	genIpush
+   001F 21 00 08            204 	ld	hl,#0x0800
+   0022 E5                  205 	push	hl
+                            206 ;	genCall
+   0023 CD 00 00            207 	call	_set_sprite_data
+   0026 E8 04               208 	lda	sp,4(sp)
+                            209 ;	pongone.c 98
+                            210 ;	genAssign
+                            211 ;	AOP_HL for _paddle_sprite_left
+   0028 21 CE 01            212 	ld	hl,#_paddle_sprite_left
+   002B 4E                  213 	ld	c,(hl)
+   002C 23                  214 	inc	hl
+   002D 46                  215 	ld	b,(hl)
+                            216 ;	genCast
+                            217 ; Removed redundent load
+                            218 ;	genIpush
+                            219 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+   002E 3E 00               220 	ld	a,#0x00
+   0030 F5                  221 	push	af
+   0031 33                  222 	inc	sp
+                            223 ;	genIpush
+   0032 79                  224 	ld	a,c
+   0033 F5                  225 	push	af
+   0034 33                  226 	inc	sp
+                            227 ;	genCall
+   0035 CD 00 00            228 	call	_set_sprite_tile
+   0038 E8 02               229 	lda	sp,2(sp)
+                            230 ;	pongone.c 99
+                            231 ;	genAssign
+                            232 ;	AOP_HL for _paddle_sprite_right
+   003A 21 D0 01            233 	ld	hl,#_paddle_sprite_right
+   003D 4E                  234 	ld	c,(hl)
+   003E 23                  235 	inc	hl
+   003F 46                  236 	ld	b,(hl)
+                            237 ;	genCast
+                            238 ; Removed redundent load
+                            239 ;	genIpush
+                            240 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+   0040 3E 02               241 	ld	a,#0x02
+   0042 F5                  242 	push	af
+   0043 33                  243 	inc	sp
+                            244 ;	genIpush
+   0044 79                  245 	ld	a,c
+   0045 F5                  246 	push	af
+   0046 33                  247 	inc	sp
+                            248 ;	genCall
+   0047 CD 00 00            249 	call	_set_sprite_tile
+   004A E8 02               250 	lda	sp,2(sp)
+                            251 ;	pongone.c 100
+                            252 ;	genAssign
+                            253 ;	AOP_HL for _paddle_sprite_left
+   004C 21 CE 01            254 	ld	hl,#_paddle_sprite_left
+   004F 4E                  255 	ld	c,(hl)
+   0050 23                  256 	inc	hl
+   0051 46                  257 	ld	b,(hl)
+                            258 ;	genCast
+                            259 ; Removed redundent load
+                            260 ;	genIpush
+                            261 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+                            262 ;	AOP_HL for _paddle_y
+   0052 21 0E 00            263 	ld	hl,#_paddle_y
+   0055 7E                  264 	ld	a,(hl)
+   0056 F5                  265 	push	af
+   0057 33                  266 	inc	sp
+                            267 ;	genIpush
+                            268 ;	AOP_HL for _paddle_x
+   0058 21 0D 00            269 	ld	hl,#_paddle_x
+   005B 7E                  270 	ld	a,(hl)
+   005C F5                  271 	push	af
+   005D 33                  272 	inc	sp
+                            273 ;	genIpush
+   005E 79                  274 	ld	a,c
+   005F F5                  275 	push	af
+   0060 33                  276 	inc	sp
+                            277 ;	genCall
+   0061 CD 00 00            278 	call	_move_sprite
+   0064 E8 03               279 	lda	sp,3(sp)
+                            280 ;	pongone.c 101
+                            281 ;	genPlus
+                            282 ;	AOP_HL for _paddle_x
+                            283 ;	genPlusIncr
+                            284 ;	Can't optimise plus by inc, falling back to the normal way
+   0066 21 0D 00            285 	ld	hl,#_paddle_x
+   0069 7E                  286 	ld	a,(hl)
+   006A C6 08               287 	add	a,#0x08
+   006C 4F                  288 	ld	c,a
+                            289 ;	genAssign
+                            290 ;	AOP_HL for _paddle_sprite_right
+                            291 ;	AOP_STK for _set_paddle_sloc0_1_0
+   006D 21 D0 01            292 	ld	hl,#_paddle_sprite_right
+   0070 2A                  293 	ld	a,(hl+)
+   0071 5E                  294 	ld	e,(hl)
+   0072 F8 00               295 	lda	hl,0(sp)
+   0074 22                  296 	ld	(hl+),a
+   0075 73                  297 	ld	(hl),e
+                            298 ;	genCast
+                            299 ;	AOP_STK for _set_paddle_sloc0_1_0
+   0076 2B                  300 	dec	hl
+   0077 46                  301 	ld	b,(hl)
+                            302 ;	genIpush
+                            303 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+                            304 ;	AOP_HL for _paddle_y
+   0078 21 0E 00            305 	ld	hl,#_paddle_y
+   007B 7E                  306 	ld	a,(hl)
+   007C F5                  307 	push	af
+   007D 33                  308 	inc	sp
+                            309 ;	genIpush
+   007E 79                  310 	ld	a,c
+   007F F5                  311 	push	af
+   0080 33                  312 	inc	sp
+                            313 ;	genIpush
+   0081 78                  314 	ld	a,b
+   0082 F5                  315 	push	af
+   0083 33                  316 	inc	sp
+                            317 ;	genCall
+   0084 CD 00 00            318 	call	_move_sprite
+   0087 E8 03               319 	lda	sp,3(sp)
+                            320 ;	genLabel
+   0089                     321 00101$:
+                            322 ;	genEndFunction
+   0089 E8 02               323 	lda	sp,2(sp)
+   008B C9                  324 	ret
+   008C                     325 ___set_paddle_end:
+   008C                     326 _paddle_sprite_data:
+   008C 00                  327 	.db #0x00
+   008D 00                  328 	.db #0x00
+   008E 00                  329 	.db #0x00
+   008F 00                  330 	.db #0x00
+   0090 00                  331 	.db #0x00
+   0091 00                  332 	.db #0x00
+   0092 00                  333 	.db #0x00
+   0093 00                  334 	.db #0x00
+   0094 00                  335 	.db #0x00
+   0095 00                  336 	.db #0x00
+   0096 00                  337 	.db #0x00
+   0097 00                  338 	.db #0x00
+   0098 00                  339 	.db #0x00
+   0099 00                  340 	.db #0x00
+   009A 00                  341 	.db #0x00
+   009B 00                  342 	.db #0x00
+   009C 00                  343 	.db #0x00
+   009D 00                  344 	.db #0x00
+   009E 00                  345 	.db #0x00
+   009F 00                  346 	.db #0x00
+   00A0 00                  347 	.db #0x00
+   00A1 00                  348 	.db #0x00
+   00A2 00                  349 	.db #0x00
+   00A3 00                  350 	.db #0x00
+   00A4 FF                  351 	.db #0xFF
+   00A5 FF                  352 	.db #0xFF
+   00A6 FF                  353 	.db #0xFF
+   00A7 FF                  354 	.db #0xFF
+   00A8 7F                  355 	.db #0x7F
+   00A9 7F                  356 	.db #0x7F
+   00AA 3F                  357 	.db #0x3F
+   00AB 3F                  358 	.db #0x3F
+   00AC 00                  359 	.db #0x00
+   00AD 00                  360 	.db #0x00
+   00AE 00                  361 	.db #0x00
+   00AF 00                  362 	.db #0x00
+   00B0 00                  363 	.db #0x00
+   00B1 00                  364 	.db #0x00
+   00B2 00                  365 	.db #0x00
+   00B3 00                  366 	.db #0x00
+   00B4 00                  367 	.db #0x00
+   00B5 00                  368 	.db #0x00
+   00B6 00                  369 	.db #0x00
+   00B7 00                  370 	.db #0x00
+   00B8 00                  371 	.db #0x00
+   00B9 00                  372 	.db #0x00
+   00BA 00                  373 	.db #0x00
+   00BB 00                  374 	.db #0x00
+   00BC 00                  375 	.db #0x00
+   00BD 00                  376 	.db #0x00
+   00BE 00                  377 	.db #0x00
+   00BF 00                  378 	.db #0x00
+   00C0 00                  379 	.db #0x00
+   00C1 00                  380 	.db #0x00
+   00C2 00                  381 	.db #0x00
+   00C3 00                  382 	.db #0x00
+   00C4 FF                  383 	.db #0xFF
+   00C5 FF                  384 	.db #0xFF
+   00C6 FF                  385 	.db #0xFF
+   00C7 FF                  386 	.db #0xFF
+   00C8 FE                  387 	.db #0xFE
+   00C9 FE                  388 	.db #0xFE
+   00CA FC                  389 	.db #0xFC
+   00CB FC                  390 	.db #0xFC
+   00CC                     391 _ball_sprite_data:
+   00CC 07                  392 	.db #0x07
+   00CD 07                  393 	.db #0x07
+   00CE 1F                  394 	.db #0x1F
+   00CF 1F                  395 	.db #0x1F
+   00D0 3F                  396 	.db #0x3F
+   00D1 3F                  397 	.db #0x3F
+   00D2 7F                  398 	.db #0x7F
+   00D3 7F                  399 	.db #0x7F
+   00D4 7F                  400 	.db #0x7F
+   00D5 7F                  401 	.db #0x7F
+   00D6 FF                  402 	.db #0xFF
+   00D7 FF                  403 	.db #0xFF
+   00D8 FF                  404 	.db #0xFF
+   00D9 FF                  405 	.db #0xFF
+   00DA FF                  406 	.db #0xFF
+   00DB FF                  407 	.db #0xFF
+   00DC FF                  408 	.db #0xFF
+   00DD FF                  409 	.db #0xFF
+   00DE FF                  410 	.db #0xFF
+   00DF FF                  411 	.db #0xFF
+   00E0 FF                  412 	.db #0xFF
+   00E1 FF                  413 	.db #0xFF
+   00E2 7F                  414 	.db #0x7F
+   00E3 7F                  415 	.db #0x7F
+   00E4 7F                  416 	.db #0x7F
+   00E5 7F                  417 	.db #0x7F
+   00E6 3F                  418 	.db #0x3F
+   00E7 3F                  419 	.db #0x3F
+   00E8 1F                  420 	.db #0x1F
+   00E9 1F                  421 	.db #0x1F
+   00EA 07                  422 	.db #0x07
+   00EB 07                  423 	.db #0x07
+   00EC E0                  424 	.db #0xE0
+   00ED E0                  425 	.db #0xE0
+   00EE F8                  426 	.db #0xF8
+   00EF F8                  427 	.db #0xF8
+   00F0 FC                  428 	.db #0xFC
+   00F1 FC                  429 	.db #0xFC
+   00F2 FE                  430 	.db #0xFE
+   00F3 FE                  431 	.db #0xFE
+   00F4 FE                  432 	.db #0xFE
+   00F5 FE                  433 	.db #0xFE
+   00F6 FF                  434 	.db #0xFF
+   00F7 FF                  435 	.db #0xFF
+   00F8 FF                  436 	.db #0xFF
+   00F9 FF                  437 	.db #0xFF
+   00FA FF                  438 	.db #0xFF
+   00FB FF                  439 	.db #0xFF
+   00FC FF                  440 	.db #0xFF
+   00FD FF                  441 	.db #0xFF
+   00FE FF                  442 	.db #0xFF
+   00FF FF                  443 	.db #0xFF
+   0100 FF                  444 	.db #0xFF
+   0101 FF                  445 	.db #0xFF
+   0102 FE                  446 	.db #0xFE
+   0103 FE                  447 	.db #0xFE
+   0104 FE                  448 	.db #0xFE
+   0105 FE                  449 	.db #0xFE
+   0106 FC                  450 	.db #0xFC
+   0107 FC                  451 	.db #0xFC
+   0108 F8                  452 	.db #0xF8
+   0109 F8                  453 	.db #0xF8
+   010A E0                  454 	.db #0xE0
+   010B E0                  455 	.db #0xE0
+   010C                     456 _smile_sprite_data:
+   010C 07                  457 	.db #0x07
+   010D 07                  458 	.db #0x07
+   010E 1F                  459 	.db #0x1F
+   010F 1F                  460 	.db #0x1F
+   0110 3F                  461 	.db #0x3F
+   0111 3F                  462 	.db #0x3F
+   0112 7F                  463 	.db #0x7F
+   0113 7B                  464 	.db #0x7B
+   0114 7F                  465 	.db #0x7F
+   0115 73                  466 	.db #0x73
+   0116 FF                  467 	.db #0xFF
+   0117 F3                  468 	.db #0xF3
+   0118 F3                  469 	.db #0xF3
+   0119 FF                  470 	.db #0xFF
+   011A F3                  471 	.db #0xF3
+   011B FF                  472 	.db #0xFF
+   011C FF                  473 	.db #0xFF
+   011D FF                  474 	.db #0xFF
+   011E FF                  475 	.db #0xFF
+   011F FF                  476 	.db #0xFF
+   0120 FF                  477 	.db #0xFF
+   0121 E0                  478 	.db #0xE0
+   0122 7F                  479 	.db #0x7F
+   0123 60                  480 	.db #0x60
+   0124 7F                  481 	.db #0x7F
+   0125 70                  482 	.db #0x70
+   0126 3F                  483 	.db #0x3F
+   0127 3C                  484 	.db #0x3C
+   0128 1F                  485 	.db #0x1F
+   0129 1F                  486 	.db #0x1F
+   012A 07                  487 	.db #0x07
+   012B 07                  488 	.db #0x07
+   012C E0                  489 	.db #0xE0
+   012D E0                  490 	.db #0xE0
+   012E F8                  491 	.db #0xF8
+   012F F8                  492 	.db #0xF8
+   0130 FC                  493 	.db #0xFC
+   0131 FC                  494 	.db #0xFC
+   0132 FE                  495 	.db #0xFE
+   0133 DE                  496 	.db #0xDE
+   0134 FE                  497 	.db #0xFE
+   0135 CE                  498 	.db #0xCE
+   0136 FF                  499 	.db #0xFF
+   0137 CF                  500 	.db #0xCF
+   0138 CF                  501 	.db #0xCF
+   0139 FF                  502 	.db #0xFF
+   013A CF                  503 	.db #0xCF
+   013B FF                  504 	.db #0xFF
+   013C FF                  505 	.db #0xFF
+   013D FF                  506 	.db #0xFF
+   013E FF                  507 	.db #0xFF
+   013F FF                  508 	.db #0xFF
+   0140 FF                  509 	.db #0xFF
+   0141 07                  510 	.db #0x07
+   0142 FE                  511 	.db #0xFE
+   0143 06                  512 	.db #0x06
+   0144 FE                  513 	.db #0xFE
+   0145 0E                  514 	.db #0x0E
+   0146 FC                  515 	.db #0xFC
+   0147 3C                  516 	.db #0x3C
+   0148 F8                  517 	.db #0xF8
+   0149 F8                  518 	.db #0xF8
+   014A E0                  519 	.db #0xE0
+   014B E0                  520 	.db #0xE0
+   014C                     521 _death_sprite_data:
+   014C 07                  522 	.db #0x07
+   014D 07                  523 	.db #0x07
+   014E 1F                  524 	.db #0x1F
+   014F 1F                  525 	.db #0x1F
+   0150 0F                  526 	.db #0x0F
+   0151 0F                  527 	.db #0x0F
+   0152 67                  528 	.db #0x67
+   0153 67                  529 	.db #0x67
+   0154 73                  530 	.db #0x73
+   0155 73                  531 	.db #0x73
+   0156 F9                  532 	.db #0xF9
+   0157 F9                  533 	.db #0xF9
+   0158 FC                  534 	.db #0xFC
+   0159 FC                  535 	.db #0xFC
+   015A FE                  536 	.db #0xFE
+   015B FE                  537 	.db #0xFE
+   015C FC                  538 	.db #0xFC
+   015D FC                  539 	.db #0xFC
+   015E F9                  540 	.db #0xF9
+   015F F9                  541 	.db #0xF9
+   0160 F3                  542 	.db #0xF3
+   0161 F3                  543 	.db #0xF3
+   0162 67                  544 	.db #0x67
+   0163 67                  545 	.db #0x67
+   0164 4F                  546 	.db #0x4F
+   0165 4F                  547 	.db #0x4F
+   0166 1F                  548 	.db #0x1F
+   0167 1F                  549 	.db #0x1F
+   0168 1F                  550 	.db #0x1F
+   0169 1F                  551 	.db #0x1F
+   016A 07                  552 	.db #0x07
+   016B 07                  553 	.db #0x07
+   016C E0                  554 	.db #0xE0
+   016D E0                  555 	.db #0xE0
+   016E F8                  556 	.db #0xF8
+   016F F8                  557 	.db #0xF8
+   0170 F0                  558 	.db #0xF0
+   0171 F0                  559 	.db #0xF0
+   0172 E6                  560 	.db #0xE6
+   0173 E6                  561 	.db #0xE6
+   0174 CE                  562 	.db #0xCE
+   0175 CE                  563 	.db #0xCE
+   0176 9F                  564 	.db #0x9F
+   0177 9F                  565 	.db #0x9F
+   0178 3F                  566 	.db #0x3F
+   0179 3F                  567 	.db #0x3F
+   017A 7F                  568 	.db #0x7F
+   017B 7F                  569 	.db #0x7F
+   017C 3F                  570 	.db #0x3F
+   017D 3F                  571 	.db #0x3F
+   017E 9F                  572 	.db #0x9F
+   017F 9F                  573 	.db #0x9F
+   0180 CF                  574 	.db #0xCF
+   0181 CF                  575 	.db #0xCF
+   0182 E6                  576 	.db #0xE6
+   0183 E6                  577 	.db #0xE6
+   0184 F2                  578 	.db #0xF2
+   0185 F2                  579 	.db #0xF2
+   0186 F8                  580 	.db #0xF8
+   0187 F8                  581 	.db #0xF8
+   0188 F8                  582 	.db #0xF8
+   0189 F8                  583 	.db #0xF8
+   018A E0                  584 	.db #0xE0
+   018B E0                  585 	.db #0xE0
+   018C                     586 _block_sprite_data:
+   018C FF                  587 	.db #0xFF
+   018D FF                  588 	.db #0xFF
+   018E FF                  589 	.db #0xFF
+   018F 80                  590 	.db #0x80
+   0190 FF                  591 	.db #0xFF
+   0191 BF                  592 	.db #0xBF
+   0192 FF                  593 	.db #0xFF
+   0193 A0                  594 	.db #0xA0
+   0194 FF                  595 	.db #0xFF
+   0195 AF                  596 	.db #0xAF
+   0196 FF                  597 	.db #0xFF
+   0197 A8                  598 	.db #0xA8
+   0198 FF                  599 	.db #0xFF
+   0199 AB                  600 	.db #0xAB
+   019A FF                  601 	.db #0xFF
+   019B AA                  602 	.db #0xAA
+   019C FF                  603 	.db #0xFF
+   019D AA                  604 	.db #0xAA
+   019E FF                  605 	.db #0xFF
+   019F AB                  606 	.db #0xAB
+   01A0 FF                  607 	.db #0xFF
+   01A1 A8                  608 	.db #0xA8
+   01A2 FF                  609 	.db #0xFF
+   01A3 AF                  610 	.db #0xAF
+   01A4 FF                  611 	.db #0xFF
+   01A5 A0                  612 	.db #0xA0
+   01A6 FF                  613 	.db #0xFF
+   01A7 BF                  614 	.db #0xBF
+   01A8 FF                  615 	.db #0xFF
+   01A9 80                  616 	.db #0x80
+   01AA FF                  617 	.db #0xFF
+   01AB FF                  618 	.db #0xFF
+   01AC FF                  619 	.db #0xFF
+   01AD FF                  620 	.db #0xFF
+   01AE FF                  621 	.db #0xFF
+   01AF 01                  622 	.db #0x01
+   01B0 FF                  623 	.db #0xFF
+   01B1 FD                  624 	.db #0xFD
+   01B2 FF                  625 	.db #0xFF
+   01B3 05                  626 	.db #0x05
+   01B4 FF                  627 	.db #0xFF
+   01B5 F5                  628 	.db #0xF5
+   01B6 FF                  629 	.db #0xFF
+   01B7 15                  630 	.db #0x15
+   01B8 FF                  631 	.db #0xFF
+   01B9 D5                  632 	.db #0xD5
+   01BA FF                  633 	.db #0xFF
+   01BB 55                  634 	.db #0x55
+   01BC FF                  635 	.db #0xFF
+   01BD 55                  636 	.db #0x55
+   01BE FF                  637 	.db #0xFF
+   01BF D5                  638 	.db #0xD5
+   01C0 FF                  639 	.db #0xFF
+   01C1 15                  640 	.db #0x15
+   01C2 FF                  641 	.db #0xFF
+   01C3 F5                  642 	.db #0xF5
+   01C4 FF                  643 	.db #0xFF
+   01C5 05                  644 	.db #0x05
+   01C6 FF                  645 	.db #0xFF
+   01C7 FD                  646 	.db #0xFD
+   01C8 FF                  647 	.db #0xFF
+   01C9 01                  648 	.db #0x01
+   01CA FF                  649 	.db #0xFF
+   01CB FF                  650 	.db #0xFF
+   01CC                     651 _INITIAL_LIVES:
+   01CC 03 00               652 	.dw #0x0003
+   01CE                     653 _paddle_sprite_left:
+   01CE 00 00               654 	.dw #0x0000
+   01D0                     655 _paddle_sprite_right:
+   01D0 01 00               656 	.dw #0x0001
+   01D2                     657 _paddle_speed:
+   01D2 02 00               658 	.dw #0x0002
+   01D4                     659 _ball_sprite_left:
+   01D4 02 00               660 	.dw #0x0002
+   01D6                     661 _ball_sprite_right:
+   01D6 03 00               662 	.dw #0x0003
+   01D8                     663 _lives_sprite_begin:
+   01D8 04 00               664 	.dw #0x0004
+                            665 ;	pongone.c 104
+                            666 ;	genLabel
+                            667 ;	genFunction
+                            668 ;	---------------------------------
+                            669 ; Function set_ball
+                            670 ; ---------------------------------
+   01DA                     671 ___set_ball_start:
+   01DA                     672 _set_ball:
+   01DA E8 FE               673 	lda	sp,-2(sp)
+                            674 ;	pongone.c 106
+                            675 ;	genRightShift
+                            676 ;	AOP_HL for _SCREEN_WIDTH
+   01DC 21 00 00            677 	ld	hl,#_SCREEN_WIDTH
+   01DF 4E                  678 	ld	c,(hl)
+   01E0 23                  679 	inc	hl
+   01E1 46                  680 	ld	b,(hl)
+   01E2 CB 28               681 	sra	b
+   01E4 CB 19               682 	rr	c
+                            683 ;	genCast
+                            684 ;	AOP_HL for _ball_x
+   01E6 21 11 00            685 	ld	hl,#_ball_x
+   01E9 71                  686 	ld	(hl),c
+                            687 ;	pongone.c 107
+                            688 ;	genMinus
+                            689 ;	AOP_HL for _SCREEN_HEIGHT
+   01EA 21 02 00            690 	ld	hl,#_SCREEN_HEIGHT
+   01ED 7E                  691 	ld	a,(hl)
+   01EE C6 FB               692 	add	a,#0xFB
+   01F0 4F                  693 	ld	c,a
+   01F1 23                  694 	inc	hl
+   01F2 7E                  695 	ld	a,(hl)
+   01F3 CE FF               696 	adc	a,#0xFF
+   01F5 47                  697 	ld	b,a
+                            698 ;	genCast
+                            699 ;	AOP_HL for _ball_y
+   01F6 21 12 00            700 	ld	hl,#_ball_y
+   01F9 71                  701 	ld	(hl),c
+                            702 ;	pongone.c 109
+                            703 ;	genIpush
+                            704 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+   01FA 21 CC 00            705 	ld	hl,#_ball_sprite_data
+   01FD E5                  706 	push	hl
+                            707 ;	genIpush
+   01FE 21 08 08            708 	ld	hl,#0x0808
+   0201 E5                  709 	push	hl
+                            710 ;	genCall
+   0202 CD 00 00            711 	call	_set_sprite_data
+   0205 E8 04               712 	lda	sp,4(sp)
+                            713 ;	pongone.c 110
+                            714 ;	genAssign
+                            715 ;	AOP_HL for _ball_sprite_left
+   0207 21 D4 01            716 	ld	hl,#_ball_sprite_left
+   020A 4E                  717 	ld	c,(hl)
+   020B 23                  718 	inc	hl
+   020C 46                  719 	ld	b,(hl)
+                            720 ;	genCast
+                            721 ; Removed redundent load
+                            722 ;	genIpush
+                            723 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+   020D 3E 08               724 	ld	a,#0x08
+   020F F5                  725 	push	af
+   0210 33                  726 	inc	sp
+                            727 ;	genIpush
+   0211 79                  728 	ld	a,c
+   0212 F5                  729 	push	af
+   0213 33                  730 	inc	sp
+                            731 ;	genCall
+   0214 CD 00 00            732 	call	_set_sprite_tile
+   0217 E8 02               733 	lda	sp,2(sp)
+                            734 ;	pongone.c 111
+                            735 ;	genAssign
+                            736 ;	AOP_HL for _ball_sprite_right
+   0219 21 D6 01            737 	ld	hl,#_ball_sprite_right
+   021C 4E                  738 	ld	c,(hl)
+   021D 23                  739 	inc	hl
+   021E 46                  740 	ld	b,(hl)
+                            741 ;	genCast
+                            742 ; Removed redundent load
+                            743 ;	genIpush
+                            744 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+   021F 3E 0A               745 	ld	a,#0x0A
+   0221 F5                  746 	push	af
+   0222 33                  747 	inc	sp
+                            748 ;	genIpush
+   0223 79                  749 	ld	a,c
+   0224 F5                  750 	push	af
+   0225 33                  751 	inc	sp
+                            752 ;	genCall
+   0226 CD 00 00            753 	call	_set_sprite_tile
+   0229 E8 02               754 	lda	sp,2(sp)
+                            755 ;	pongone.c 112
+                            756 ;	genAssign
+                            757 ;	AOP_HL for _ball_sprite_left
+   022B 21 D4 01            758 	ld	hl,#_ball_sprite_left
+   022E 4E                  759 	ld	c,(hl)
+   022F 23                  760 	inc	hl
+   0230 46                  761 	ld	b,(hl)
+                            762 ;	genCast
+                            763 ; Removed redundent load
+                            764 ;	genIpush
+                            765 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+                            766 ;	AOP_HL for _ball_y
+   0231 21 12 00            767 	ld	hl,#_ball_y
+   0234 7E                  768 	ld	a,(hl)
+   0235 F5                  769 	push	af
+   0236 33                  770 	inc	sp
+                            771 ;	genIpush
+                            772 ;	AOP_HL for _ball_x
+   0237 21 11 00            773 	ld	hl,#_ball_x
+   023A 7E                  774 	ld	a,(hl)
+   023B F5                  775 	push	af
+   023C 33                  776 	inc	sp
+                            777 ;	genIpush
+   023D 79                  778 	ld	a,c
+   023E F5                  779 	push	af
+   023F 33                  780 	inc	sp
+                            781 ;	genCall
+   0240 CD 00 00            782 	call	_move_sprite
+   0243 E8 03               783 	lda	sp,3(sp)
+                            784 ;	pongone.c 113
+                            785 ;	genPlus
+                            786 ;	AOP_HL for _ball_x
+                            787 ;	genPlusIncr
+                            788 ;	Can't optimise plus by inc, falling back to the normal way
+   0245 21 11 00            789 	ld	hl,#_ball_x
+   0248 7E                  790 	ld	a,(hl)
+   0249 C6 08               791 	add	a,#0x08
+   024B 4F                  792 	ld	c,a
+                            793 ;	genAssign
+                            794 ;	AOP_HL for _ball_sprite_right
+                            795 ;	AOP_STK for _set_ball_sloc0_1_0
+   024C 21 D6 01            796 	ld	hl,#_ball_sprite_right
+   024F 2A                  797 	ld	a,(hl+)
+   0250 5E                  798 	ld	e,(hl)
+   0251 F8 00               799 	lda	hl,0(sp)
+   0253 22                  800 	ld	(hl+),a
+   0254 73                  801 	ld	(hl),e
+                            802 ;	genCast
+                            803 ;	AOP_STK for _set_ball_sloc0_1_0
+   0255 2B                  804 	dec	hl
+   0256 46                  805 	ld	b,(hl)
+                            806 ;	genIpush
+                            807 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+                            808 ;	AOP_HL for _ball_y
+   0257 21 12 00            809 	ld	hl,#_ball_y
+   025A 7E                  810 	ld	a,(hl)
+   025B F5                  811 	push	af
+   025C 33                  812 	inc	sp
+                            813 ;	genIpush
+   025D 79                  814 	ld	a,c
+   025E F5                  815 	push	af
+   025F 33                  816 	inc	sp
+                            817 ;	genIpush
+   0260 78                  818 	ld	a,b
+   0261 F5                  819 	push	af
+   0262 33                  820 	inc	sp
+                            821 ;	genCall
+   0263 CD 00 00            822 	call	_move_sprite
+   0266 E8 03               823 	lda	sp,3(sp)
+                            824 ;	pongone.c 116
+                            825 ;	genIfx
+                            826 ;	AOP_STK for 
+   0268 F8 04               827 	lda	hl,4(sp)
+   026A 2A                  828 	ld	a,(hl+)
+   026B B6                  829 	or	a,(hl)
+   026C CA 7C 02            830 	jp	z,00102$
+                            831 ;	pongone.c 117
+                            832 ;	genAssign
+                            833 ;	AOP_HL for _ball_vel_y
+   026F 21 14 00            834 	ld	hl,#_ball_vel_y
+   0272 36 FF               835 	ld	(hl),#0xFF
+                            836 ;	pongone.c 118
+                            837 ;	genAssign
+                            838 ;	AOP_HL for _ball_vel_x
+   0274 21 13 00            839 	ld	hl,#_ball_vel_x
+   0277 36 FF               840 	ld	(hl),#0xFF
+                            841 ;	genGoto
+   0279 C3 86 02            842 	jp	00104$
+                            843 ;	genLabel
+   027C                     844 00102$:
+                            845 ;	pongone.c 120
+                            846 ;	genAssign
+                            847 ;	AOP_HL for _ball_vel_x
+   027C 21 13 00            848 	ld	hl,#_ball_vel_x
+   027F 36 00               849 	ld	(hl),#0x00
+                            850 ;	pongone.c 121
+                            851 ;	genAssign
+                            852 ;	AOP_HL for _ball_vel_y
+   0281 21 14 00            853 	ld	hl,#_ball_vel_y
+   0284 36 00               854 	ld	(hl),#0x00
+                            855 ;	genLabel
+   0286                     856 00104$:
+                            857 ;	genEndFunction
+   0286 E8 02               858 	lda	sp,2(sp)
+   0288 C9                  859 	ret
+   0289                     860 ___set_ball_end:
+                            861 ;	pongone.c 125
+                            862 ;	genLabel
+                            863 ;	genFunction
+                            864 ;	---------------------------------
+                            865 ; Function set_lives
+                            866 ; ---------------------------------
+   0289                     867 ___set_lives_start:
+   0289                     868 _set_lives:
+   0289 E8 F1               869 	lda	sp,-15(sp)
+                            870 ;	pongone.c 128
+                            871 ;	genAssign
+                            872 ;	AOP_HL for _lives_sprite_begin
+   028B 21 D8 01            873 	ld	hl,#_lives_sprite_begin
+   028E 4E                  874 	ld	c,(hl)
+   028F 23                  875 	inc	hl
+   0290 46                  876 	ld	b,(hl)
+                            877 ;	genAssign
+                            878 ;	AOP_STK for _set_lives_sp_1_1
+   0291 F8 03               879 	lda	hl,3(sp)
+   0293 71                  880 	ld	(hl),c
+   0294 23                  881 	inc	hl
+   0295 70                  882 	ld	(hl),b
+                            883 ;	pongone.c 130
+                            884 ;	genIpush
+                            885 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+   0296 21 0C 01            886 	ld	hl,#_smile_sprite_data
+   0299 E5                  887 	push	hl
+                            888 ;	genIpush
+   029A 21 10 08            889 	ld	hl,#0x0810
+   029D E5                  890 	push	hl
+                            891 ;	genCall
+   029E CD 00 00            892 	call	_set_sprite_data
+   02A1 E8 04               893 	lda	sp,4(sp)
+                            894 ;	pongone.c 131
+                            895 ;	genIpush
+                            896 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+   02A3 21 4C 01            897 	ld	hl,#_death_sprite_data
+   02A6 E5                  898 	push	hl
+                            899 ;	genIpush
+   02A7 21 18 08            900 	ld	hl,#0x0818
+   02AA E5                  901 	push	hl
+                            902 ;	genCall
+   02AB CD 00 00            903 	call	_set_sprite_data
+   02AE E8 04               904 	lda	sp,4(sp)
+                            905 ;	pongone.c 133
+                            906 ;	genAssign
+                            907 ;	AOP_STK for _set_lives_i_1_1
+   02B0 F8 0D               908 	lda	hl,13(sp)
+   02B2 36 00               909 	ld	(hl),#0x00
+   02B4 23                  910 	inc	hl
+   02B5 36 00               911 	ld	(hl),#0x00
+                            912 ;	genLabel
+   02B7                     913 00101$:
+                            914 ;	genCmpLt
+                            915 ;	AOP_STK for _set_lives_i_1_1
+                            916 ;	AOP_HL for _lives
+   02B7 F8 0E               917 	lda	hl,14(sp)
+   02B9 7E                  918 	ld	a,(hl)
+   02BA EE 80               919 	xor	a,#0x80
+   02BC 5F                  920 	ld	e,a
+   02BD 21 08 00            921 	ld	hl,#_lives + 1
+   02C0 7E                  922 	ld	a,(hl)
+   02C1 EE 80               923 	xor	a,#0x80
+   02C3 57                  924 	ld	d,a
+   02C4 F8 0D               925 	lda	hl,13(sp)
+   02C6 7E                  926 	ld	a,(hl)
+   02C7 21 07 00            927 	ld	hl,#_lives
+   02CA 96                  928 	sub	a,(hl)
+   02CB 7B                  929 	ld	a,e
+   02CC 9A                  930 	sbc	a,d
+   02CD D2 87 03            931 	jp	nc,00104$
+                            932 ;	pongone.c 134
+                            933 ;	genLeftShift
+                            934 ;	AOP_STK for _set_lives_i_1_1
+                            935 ;	AOP_STK for _set_lives_offset_1_1
+   02D0 F8 0D               936 	lda	hl,13(sp)
+   02D2 7E                  937 	ld	a,(hl)
+   02D3 F8 05               938 	lda	hl,5(sp)
+   02D5 77                  939 	ld	(hl),a
+   02D6 F8 0E               940 	lda	hl,14(sp)
+   02D8 7E                  941 	ld	a,(hl)
+   02D9 F8 06               942 	lda	hl,6(sp)
+   02DB 77                  943 	ld	(hl),a
+   02DC 3E 05               944 	ld	a,#0x04+1
+   02DE 18 07               945 	jr	00116$
+   02E0                     946 00115$:
+   02E0 F8 05               947 	lda	hl,5(sp)
+   02E2 CB 26               948 	sla	(hl)
+   02E4 23                  949 	inc	hl
+   02E5 CB 16               950 	rl	(hl)
+   02E7                     951 00116$:
+   02E7 3D                  952 	dec	a
+   02E8 20 F6               953 	jr	nz,00115$
+                            954 ;	pongone.c 135
+                            955 ;	genAssign
+                            956 ;	AOP_STK for _set_lives_sp_1_1
+                            957 ;	AOP_STK for _set_lives_sloc0_1_0
+   02EA F8 03               958 	lda	hl,3(sp)
+   02EC 2A                  959 	ld	a,(hl+)
+   02ED 5E                  960 	ld	e,(hl)
+   02EE F8 01               961 	lda	hl,1(sp)
+   02F0 22                  962 	ld	(hl+),a
+   02F1 73                  963 	ld	(hl),e
+                            964 ;	genPlus
+                            965 ;	AOP_STK for _set_lives_sp_1_1
+                            966 ;	genPlusIncr
+   02F2 23                  967 	inc	hl
+   02F3 34                  968 	inc	(hl)
+   02F4 20 02               969 	jr	nz,00117$
+   02F6 23                  970 	inc	hl
+   02F7 34                  971 	inc	(hl)
+   02F8                     972 00117$:
+                            973 ;	genAssign
+                            974 ;	AOP_STK for _set_lives_sloc0_1_0
+                            975 ;	AOP_STK for _set_lives_a_1_1
+   02F8 F8 01               976 	lda	hl,1(sp)
+   02FA 2A                  977 	ld	a,(hl+)
+   02FB 5E                  978 	ld	e,(hl)
+   02FC F8 09               979 	lda	hl,9(sp)
+   02FE 22                  980 	ld	(hl+),a
+   02FF 73                  981 	ld	(hl),e
+                            982 ;	pongone.c 136
+                            983 ;	genAssign
+                            984 ;	AOP_STK for _set_lives_sp_1_1
+                            985 ;	AOP_STK for _set_lives_sloc0_1_0
+   0300 F8 03               986 	lda	hl,3(sp)
+   0302 2A                  987 	ld	a,(hl+)
+   0303 5E                  988 	ld	e,(hl)
+   0304 F8 01               989 	lda	hl,1(sp)
+   0306 22                  990 	ld	(hl+),a
+   0307 73                  991 	ld	(hl),e
+                            992 ;	genPlus
+                            993 ;	AOP_STK for _set_lives_sp_1_1
+                            994 ;	genPlusIncr
+   0308 23                  995 	inc	hl
+   0309 34                  996 	inc	(hl)
+   030A 20 02               997 	jr	nz,00118$
+   030C 23                  998 	inc	hl
+   030D 34                  999 	inc	(hl)
+   030E                    1000 00118$:
+                           1001 ;	genAssign
+                           1002 ;	AOP_STK for _set_lives_sloc0_1_0
+                           1003 ;	AOP_STK for _set_lives_b_1_1
+   030E F8 01              1004 	lda	hl,1(sp)
+   0310 2A                 1005 	ld	a,(hl+)
+   0311 5E                 1006 	ld	e,(hl)
+   0312 F8 07              1007 	lda	hl,7(sp)
+   0314 22                 1008 	ld	(hl+),a
+   0315 73                 1009 	ld	(hl),e
+                           1010 ;	pongone.c 138
+                           1011 ;	genCast
+                           1012 ;	AOP_STK for _set_lives_a_1_1
+   0316 23                 1013 	inc	hl
+   0317 4E                 1014 	ld	c,(hl)
+                           1015 ;	genIpush
+                           1016 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 1 deSending: 0
+   0318 C5                 1017 	push	bc
+   0319 3E 10              1018 	ld	a,#0x10
+   031B F5                 1019 	push	af
+   031C 33                 1020 	inc	sp
+                           1021 ;	genIpush
+   031D 79                 1022 	ld	a,c
+   031E F5                 1023 	push	af
+   031F 33                 1024 	inc	sp
+                           1025 ;	genCall
+   0320 CD 00 00           1026 	call	_set_sprite_tile
+   0323 E8 02              1027 	lda	sp,2(sp)
+   0325 E1                 1028 	pop	hl
+   0326 4D                 1029 	ld	c,l
+                           1030 ;	pongone.c 139
+                           1031 ;	genCast
+                           1032 ;	AOP_STK for _set_lives_b_1_1
+   0327 F8 07              1033 	lda	hl,7(sp)
+   0329 46                 1034 	ld	b,(hl)
+                           1035 ;	genIpush
+                           1036 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 1 deSending: 0
+   032A C5                 1037 	push	bc
+   032B 3E 12              1038 	ld	a,#0x12
+   032D F5                 1039 	push	af
+   032E 33                 1040 	inc	sp
+                           1041 ;	genIpush
+   032F 78                 1042 	ld	a,b
+   0330 F5                 1043 	push	af
+   0331 33                 1044 	inc	sp
+                           1045 ;	genCall
+   0332 CD 00 00           1046 	call	_set_sprite_tile
+   0335 E8 02              1047 	lda	sp,2(sp)
+   0337 C1                 1048 	pop	bc
+                           1049 ;	pongone.c 140
+                           1050 ;	genPlus
+                           1051 ;	AOP_STK for _set_lives_offset_1_1
+                           1052 ;	AOP_STK for _set_lives_sloc0_1_0
+                           1053 ;	genPlusIncr
+                           1054 ;	Can't optimise plus by inc, falling back to the normal way
+   0338 F8 05              1055 	lda	hl,5(sp)
+   033A 5E                 1056 	ld	e,(hl)
+   033B 23                 1057 	inc	hl
+   033C 56                 1058 	ld	d,(hl)
+   033D 21 08 00           1059 	ld	hl,#0x0008
+   0340 19                 1060 	add	hl,de
+   0341 7D                 1061 	ld	a,l
+   0342 54                 1062 	ld	d,h
+   0343 F8 01              1063 	lda	hl,1(sp)
+   0345 22                 1064 	ld	(hl+),a
+   0346 72                 1065 	ld	(hl),d
+                           1066 ;	genCast
+                           1067 ;	AOP_STK for _set_lives_sloc0_1_0
+                           1068 ;	AOP_STK for _set_lives_sloc1_1_0
+   0347 2B                 1069 	dec	hl
+   0348 7E                 1070 	ld	a,(hl)
+   0349 2B                 1071 	dec	hl
+   034A 77                 1072 	ld	(hl),a
+                           1073 ;	genIpush
+                           1074 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 1 deSending: 0
+   034B C5                 1075 	push	bc
+   034C 3E 10              1076 	ld	a,#0x10
+   034E F5                 1077 	push	af
+   034F 33                 1078 	inc	sp
+                           1079 ;	genIpush
+                           1080 ;	AOP_STK for _set_lives_sloc1_1_0
+   0350 7E                 1081 	ld	a,(hl)
+   0351 F5                 1082 	push	af
+   0352 33                 1083 	inc	sp
+                           1084 ;	genIpush
+   0353 79                 1085 	ld	a,c
+   0354 F5                 1086 	push	af
+   0355 33                 1087 	inc	sp
+                           1088 ;	genCall
+   0356 CD 00 00           1089 	call	_move_sprite
+   0359 E8 03              1090 	lda	sp,3(sp)
+   035B E1                 1091 	pop	hl
+   035C 44                 1092 	ld	b,h
+                           1093 ;	pongone.c 141
+                           1094 ;	genPlus
+                           1095 ;	AOP_STK for _set_lives_offset_1_1
+                           1096 ;	AOP_STK for _set_lives_sloc0_1_0
+                           1097 ;	genPlusIncr
+                           1098 ;	Can't optimise plus by inc, falling back to the normal way
+   035D F8 05              1099 	lda	hl,5(sp)
+   035F 5E                 1100 	ld	e,(hl)
+   0360 23                 1101 	inc	hl
+   0361 56                 1102 	ld	d,(hl)
+   0362 21 10 00           1103 	ld	hl,#0x0010
+   0365 19                 1104 	add	hl,de
+   0366 7D                 1105 	ld	a,l
+   0367 54                 1106 	ld	d,h
+   0368 F8 01              1107 	lda	hl,1(sp)
+   036A 22                 1108 	ld	(hl+),a
+   036B 72                 1109 	ld	(hl),d
+                           1110 ;	genCast
+                           1111 ;	AOP_STK for _set_lives_sloc0_1_0
+   036C 2B                 1112 	dec	hl
+   036D 4E                 1113 	ld	c,(hl)
+                           1114 ;	genIpush
+                           1115 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+   036E 3E 10              1116 	ld	a,#0x10
+   0370 F5                 1117 	push	af
+   0371 33                 1118 	inc	sp
+                           1119 ;	genIpush
+   0372 79                 1120 	ld	a,c
+   0373 F5                 1121 	push	af
+   0374 33                 1122 	inc	sp
+                           1123 ;	genIpush
+   0375 78                 1124 	ld	a,b
+   0376 F5                 1125 	push	af
+   0377 33                 1126 	inc	sp
+                           1127 ;	genCall
+   0378 CD 00 00           1128 	call	_move_sprite
+   037B E8 03              1129 	lda	sp,3(sp)
+                           1130 ;	pongone.c 133
+                           1131 ;	genPlus
+                           1132 ;	AOP_STK for _set_lives_i_1_1
+                           1133 ;	genPlusIncr
+   037D F8 0D              1134 	lda	hl,13(sp)
+   037F 34                 1135 	inc	(hl)
+   0380 20 02              1136 	jr	nz,00119$
+   0382 23                 1137 	inc	hl
+   0383 34                 1138 	inc	(hl)
+   0384                    1139 00119$:
+                           1140 ;	genGoto
+   0384 C3 B7 02           1141 	jp	00101$
+                           1142 ;	genLabel
+   0387                    1143 00104$:
+                           1144 ;	pongone.c 144
+                           1145 ;	genAssign
+                           1146 ;	AOP_HL for _lives
+                           1147 ;	AOP_STK for _set_lives_j_1_1
+   0387 21 07 00           1148 	ld	hl,#_lives
+   038A 2A                 1149 	ld	a,(hl+)
+   038B 5E                 1150 	ld	e,(hl)
+   038C F8 0B              1151 	lda	hl,11(sp)
+   038E 22                 1152 	ld	(hl+),a
+   038F 73                 1153 	ld	(hl),e
+                           1154 ;	genLabel
+   0390                    1155 00105$:
+                           1156 ;	genAssign
+                           1157 ;	AOP_HL for _INITIAL_LIVES
+   0390 21 CC 01           1158 	ld	hl,#_INITIAL_LIVES
+   0393 4E                 1159 	ld	c,(hl)
+   0394 23                 1160 	inc	hl
+   0395 46                 1161 	ld	b,(hl)
+                           1162 ;	genCmpLt
+                           1163 ;	AOP_STK for _set_lives_j_1_1
+   0396 F8 0C              1164 	lda	hl,12(sp)
+   0398 7E                 1165 	ld	a,(hl)
+   0399 EE 80              1166 	xor	a,#0x80
+   039B 5F                 1167 	ld	e,a
+   039C 78                 1168 	ld	a,b
+   039D EE 80              1169 	xor	a,#0x80
+   039F 57                 1170 	ld	d,a
+   03A0 2B                 1171 	dec	hl
+   03A1 7E                 1172 	ld	a,(hl)
+   03A2 91                 1173 	sub	a,c
+   03A3 7B                 1174 	ld	a,e
+   03A4 9A                 1175 	sbc	a,d
+   03A5 D2 51 04           1176 	jp	nc,00109$
+                           1177 ;	pongone.c 145
+                           1178 ;	genLeftShift
+                           1179 ;	AOP_STK for _set_lives_j_1_1
+                           1180 ;	AOP_STK for _set_lives_offset_1_1
+   03A8 7E                 1181 	ld	a,(hl)
+   03A9 F8 05              1182 	lda	hl,5(sp)
+   03AB 77                 1183 	ld	(hl),a
+   03AC F8 0C              1184 	lda	hl,12(sp)
+   03AE 7E                 1185 	ld	a,(hl)
+   03AF F8 06              1186 	lda	hl,6(sp)
+   03B1 77                 1187 	ld	(hl),a
+   03B2 3E 05              1188 	ld	a,#0x04+1
+   03B4 18 07              1189 	jr	00121$
+   03B6                    1190 00120$:
+   03B6 F8 05              1191 	lda	hl,5(sp)
+   03B8 CB 26              1192 	sla	(hl)
+   03BA 23                 1193 	inc	hl
+   03BB CB 16              1194 	rl	(hl)
+   03BD                    1195 00121$:
+   03BD 3D                 1196 	dec	a
+   03BE 20 F6              1197 	jr	nz,00120$
+                           1198 ;	pongone.c 146
+                           1199 ;	genAssign
+                           1200 ;	AOP_STK for _set_lives_sp_1_1
+   03C0 F8 03              1201 	lda	hl,3(sp)
+   03C2 4E                 1202 	ld	c,(hl)
+   03C3 23                 1203 	inc	hl
+   03C4 46                 1204 	ld	b,(hl)
+                           1205 ;	genPlus
+                           1206 ;	AOP_STK for _set_lives_sp_1_1
+                           1207 ;	genPlusIncr
+   03C5 2B                 1208 	dec	hl
+   03C6 34                 1209 	inc	(hl)
+   03C7 20 02              1210 	jr	nz,00122$
+   03C9 23                 1211 	inc	hl
+   03CA 34                 1212 	inc	(hl)
+   03CB                    1213 00122$:
+                           1214 ;	genAssign
+                           1215 ;	AOP_STK for _set_lives_a_1_1
+   03CB F8 09              1216 	lda	hl,9(sp)
+   03CD 71                 1217 	ld	(hl),c
+   03CE 23                 1218 	inc	hl
+   03CF 70                 1219 	ld	(hl),b
+                           1220 ;	pongone.c 147
+                           1221 ;	genAssign
+                           1222 ;	AOP_STK for _set_lives_sp_1_1
+   03D0 F8 03              1223 	lda	hl,3(sp)
+   03D2 4E                 1224 	ld	c,(hl)
+   03D3 23                 1225 	inc	hl
+   03D4 46                 1226 	ld	b,(hl)
+                           1227 ;	genPlus
+                           1228 ;	AOP_STK for _set_lives_sp_1_1
+                           1229 ;	genPlusIncr
+   03D5 2B                 1230 	dec	hl
+   03D6 34                 1231 	inc	(hl)
+   03D7 20 02              1232 	jr	nz,00123$
+   03D9 23                 1233 	inc	hl
+   03DA 34                 1234 	inc	(hl)
+   03DB                    1235 00123$:
+                           1236 ;	genAssign
+                           1237 ;	AOP_STK for _set_lives_b_1_1
+   03DB F8 07              1238 	lda	hl,7(sp)
+   03DD 71                 1239 	ld	(hl),c
+   03DE 23                 1240 	inc	hl
+   03DF 70                 1241 	ld	(hl),b
+                           1242 ;	pongone.c 149
+                           1243 ;	genCast
+                           1244 ;	AOP_STK for _set_lives_a_1_1
+   03E0 23                 1245 	inc	hl
+   03E1 4E                 1246 	ld	c,(hl)
+                           1247 ;	genIpush
+                           1248 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 1 deSending: 0
+   03E2 C5                 1249 	push	bc
+   03E3 3E 18              1250 	ld	a,#0x18
+   03E5 F5                 1251 	push	af
+   03E6 33                 1252 	inc	sp
+                           1253 ;	genIpush
+   03E7 79                 1254 	ld	a,c
+   03E8 F5                 1255 	push	af
+   03E9 33                 1256 	inc	sp
+                           1257 ;	genCall
+   03EA CD 00 00           1258 	call	_set_sprite_tile
+   03ED E8 02              1259 	lda	sp,2(sp)
+   03EF E1                 1260 	pop	hl
+   03F0 4D                 1261 	ld	c,l
+                           1262 ;	pongone.c 150
+                           1263 ;	genCast
+                           1264 ;	AOP_STK for _set_lives_b_1_1
+   03F1 F8 07              1265 	lda	hl,7(sp)
+   03F3 46                 1266 	ld	b,(hl)
+                           1267 ;	genIpush
+                           1268 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 1 deSending: 0
+   03F4 C5                 1269 	push	bc
+   03F5 3E 1A              1270 	ld	a,#0x1A
+   03F7 F5                 1271 	push	af
+   03F8 33                 1272 	inc	sp
+                           1273 ;	genIpush
+   03F9 78                 1274 	ld	a,b
+   03FA F5                 1275 	push	af
+   03FB 33                 1276 	inc	sp
+                           1277 ;	genCall
+   03FC CD 00 00           1278 	call	_set_sprite_tile
+   03FF E8 02              1279 	lda	sp,2(sp)
+   0401 C1                 1280 	pop	bc
+                           1281 ;	pongone.c 151
+                           1282 ;	genPlus
+                           1283 ;	AOP_STK for _set_lives_offset_1_1
+                           1284 ;	AOP_STK for _set_lives_sloc0_1_0
+                           1285 ;	genPlusIncr
+                           1286 ;	Can't optimise plus by inc, falling back to the normal way
+   0402 F8 05              1287 	lda	hl,5(sp)
+   0404 5E                 1288 	ld	e,(hl)
+   0405 23                 1289 	inc	hl
+   0406 56                 1290 	ld	d,(hl)
+   0407 21 08 00           1291 	ld	hl,#0x0008
+   040A 19                 1292 	add	hl,de
+   040B 7D                 1293 	ld	a,l
+   040C 54                 1294 	ld	d,h
+   040D F8 01              1295 	lda	hl,1(sp)
+   040F 22                 1296 	ld	(hl+),a
+   0410 72                 1297 	ld	(hl),d
+                           1298 ;	genCast
+                           1299 ;	AOP_STK for _set_lives_sloc0_1_0
+                           1300 ;	AOP_STK for _set_lives_sloc1_1_0
+   0411 2B                 1301 	dec	hl
+   0412 7E                 1302 	ld	a,(hl)
+   0413 2B                 1303 	dec	hl
+   0414 77                 1304 	ld	(hl),a
+                           1305 ;	genIpush
+                           1306 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 1 deSending: 0
+   0415 C5                 1307 	push	bc
+   0416 3E 10              1308 	ld	a,#0x10
+   0418 F5                 1309 	push	af
+   0419 33                 1310 	inc	sp
+                           1311 ;	genIpush
+                           1312 ;	AOP_STK for _set_lives_sloc1_1_0
+   041A 7E                 1313 	ld	a,(hl)
+   041B F5                 1314 	push	af
+   041C 33                 1315 	inc	sp
+                           1316 ;	genIpush
+   041D 79                 1317 	ld	a,c
+   041E F5                 1318 	push	af
+   041F 33                 1319 	inc	sp
+                           1320 ;	genCall
+   0420 CD 00 00           1321 	call	_move_sprite
+   0423 E8 03              1322 	lda	sp,3(sp)
+   0425 E1                 1323 	pop	hl
+   0426 44                 1324 	ld	b,h
+                           1325 ;	pongone.c 152
+                           1326 ;	genPlus
+                           1327 ;	AOP_STK for _set_lives_offset_1_1
+                           1328 ;	AOP_STK for _set_lives_sloc0_1_0
+                           1329 ;	genPlusIncr
+                           1330 ;	Can't optimise plus by inc, falling back to the normal way
+   0427 F8 05              1331 	lda	hl,5(sp)
+   0429 5E                 1332 	ld	e,(hl)
+   042A 23                 1333 	inc	hl
+   042B 56                 1334 	ld	d,(hl)
+   042C 21 10 00           1335 	ld	hl,#0x0010
+   042F 19                 1336 	add	hl,de
+   0430 7D                 1337 	ld	a,l
+   0431 54                 1338 	ld	d,h
+   0432 F8 01              1339 	lda	hl,1(sp)
+   0434 22                 1340 	ld	(hl+),a
+   0435 72                 1341 	ld	(hl),d
+                           1342 ;	genCast
+                           1343 ;	AOP_STK for _set_lives_sloc0_1_0
+   0436 2B                 1344 	dec	hl
+   0437 4E                 1345 	ld	c,(hl)
+                           1346 ;	genIpush
+                           1347 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+   0438 3E 10              1348 	ld	a,#0x10
+   043A F5                 1349 	push	af
+   043B 33                 1350 	inc	sp
+                           1351 ;	genIpush
+   043C 79                 1352 	ld	a,c
+   043D F5                 1353 	push	af
+   043E 33                 1354 	inc	sp
+                           1355 ;	genIpush
+   043F 78                 1356 	ld	a,b
+   0440 F5                 1357 	push	af
+   0441 33                 1358 	inc	sp
+                           1359 ;	genCall
+   0442 CD 00 00           1360 	call	_move_sprite
+   0445 E8 03              1361 	lda	sp,3(sp)
+                           1362 ;	pongone.c 144
+                           1363 ;	genPlus
+                           1364 ;	AOP_STK for _set_lives_j_1_1
+                           1365 ;	genPlusIncr
+   0447 F8 0B              1366 	lda	hl,11(sp)
+   0449 34                 1367 	inc	(hl)
+   044A 20 02              1368 	jr	nz,00124$
+   044C 23                 1369 	inc	hl
+   044D 34                 1370 	inc	(hl)
+   044E                    1371 00124$:
+                           1372 ;	genGoto
+   044E C3 90 03           1373 	jp	00105$
+                           1374 ;	genLabel
+   0451                    1375 00109$:
+                           1376 ;	genEndFunction
+   0451 E8 0F              1377 	lda	sp,15(sp)
+   0453 C9                 1378 	ret
+   0454                    1379 ___set_lives_end:
+                           1380 ;	pongone.c 183
+                           1381 ;	genLabel
+                           1382 ;	genFunction
+                           1383 ;	---------------------------------
+                           1384 ; Function input
+                           1385 ; ---------------------------------
+   0454                    1386 ___input_start:
+   0454                    1387 _input:
+   0454 E8 FE              1388 	lda	sp,-2(sp)
+                           1389 ;	pongone.c 186
+                           1390 ;	genAnd
+                           1391 ;	AOP_HL for _key
+   0456 21 06 00           1392 	ld	hl,#_key
+   0459 7E                 1393 	ld	a,(hl)
+   045A E6 03              1394 	and	a,#0x03
+   045C 20 03              1395 	jr	nz,00122$
+   045E C3 D1 04           1396 	jp	00108$
+   0461                    1397 00122$:
+                           1398 ;	pongone.c 187
+                           1399 ;	genAnd
+                           1400 ;	AOP_HL for _key
+   0461 21 06 00           1401 	ld	hl,#_key
+   0464 7E                 1402 	ld	a,(hl)
+   0465 E6 02              1403 	and	a,#0x02
+   0467 20 03              1404 	jr	nz,00123$
+   0469 C3 A3 04           1405 	jp	00102$
+   046C                    1406 00123$:
+                           1407 ;	genCmpGt
+                           1408 ;	AOP_HL for _paddle_x
+   046C 3E 00              1409 	ld	a,#0x00
+   046E 21 0D 00           1410 	ld	hl,#_paddle_x
+   0471 96                 1411 	sub	a,(hl)
+   0472 D2 A3 04           1412 	jp	nc,00102$
+                           1413 ;	pongone.c 188
+                           1414 ;	genAssign
+                           1415 ;	AOP_HL for _paddle_speed
+   0475 21 D2 01           1416 	ld	hl,#_paddle_speed
+   0478 4E                 1417 	ld	c,(hl)
+   0479 23                 1418 	inc	hl
+   047A 46                 1419 	ld	b,(hl)
+                           1420 ;	genMult
+   047B 59                 1421 	ld	e,c
+   047C 50                 1422 	ld	d,b
+   047D 6B                 1423 	ld	l,e
+   047E 62                 1424 	ld	h,d
+   047F 29                 1425 	add	hl,hl
+   0480 19                 1426 	add	hl,de
+   0481 29                 1427 	add	hl,hl
+   0482 19                 1428 	add	hl,de
+   0483 29                 1429 	add	hl,hl
+   0484 19                 1430 	add	hl,de
+   0485 29                 1431 	add	hl,hl
+   0486 19                 1432 	add	hl,de
+   0487 29                 1433 	add	hl,hl
+   0488 19                 1434 	add	hl,de
+   0489 29                 1435 	add	hl,hl
+   048A 19                 1436 	add	hl,de
+   048B 29                 1437 	add	hl,hl
+   048C 19                 1438 	add	hl,de
+   048D 29                 1439 	add	hl,hl
+   048E 19                 1440 	add	hl,de
+   048F 29                 1441 	add	hl,hl
+   0490 19                 1442 	add	hl,de
+   0491 29                 1443 	add	hl,hl
+   0492 19                 1444 	add	hl,de
+   0493 29                 1445 	add	hl,hl
+   0494 19                 1446 	add	hl,de
+   0495 29                 1447 	add	hl,hl
+   0496 19                 1448 	add	hl,de
+   0497 29                 1449 	add	hl,hl
+   0498 19                 1450 	add	hl,de
+   0499 29                 1451 	add	hl,hl
+   049A 19                 1452 	add	hl,de
+   049B 29                 1453 	add	hl,hl
+   049C 19                 1454 	add	hl,de
+   049D 4D                 1455 	ld	c,l
+   049E 44                 1456 	ld	b,h
+                           1457 ;	genCast
+                           1458 ;	AOP_HL for _paddle_vel_x
+   049F 21 0F 00           1459 	ld	hl,#_paddle_vel_x
+   04A2 71                 1460 	ld	(hl),c
+                           1461 ;	genLabel
+   04A3                    1462 00102$:
+                           1463 ;	pongone.c 190
+                           1464 ;	genAnd
+                           1465 ;	AOP_HL for _key
+   04A3 21 06 00           1466 	ld	hl,#_key
+   04A6 7E                 1467 	ld	a,(hl)
+   04A7 E6 01              1468 	and	a,#0x01
+   04A9 20 03              1469 	jr	nz,00124$
+   04AB C3 D1 04           1470 	jp	00108$
+   04AE                    1471 00124$:
+                           1472 ;	genCast
+                           1473 ;	AOP_HL for _paddle_x
+                           1474 ;	AOP_STK for _input_sloc0_1_0
+   04AE 21 0D 00           1475 	ld	hl,#_paddle_x
+   04B1 7E                 1476 	ld	a,(hl)
+   04B2 F8 00              1477 	lda	hl,0(sp)
+   04B4 22                 1478 	ld	(hl+),a
+   04B5 36 00              1479 	ld	(hl),#0x00
+                           1480 ;	genAssign
+                           1481 ;	AOP_HL for _SCREEN_WIDTH
+   04B7 21 00 00           1482 	ld	hl,#_SCREEN_WIDTH
+   04BA 4E                 1483 	ld	c,(hl)
+   04BB 23                 1484 	inc	hl
+   04BC 46                 1485 	ld	b,(hl)
+                           1486 ;	genCmpLt
+                           1487 ;	AOP_STK for _input_sloc0_1_0
+   04BD F8 00              1488 	lda	hl,0(sp)
+   04BF 7E                 1489 	ld	a,(hl)
+   04C0 91                 1490 	sub	a,c
+   04C1 23                 1491 	inc	hl
+   04C2 7E                 1492 	ld	a,(hl)
+   04C3 98                 1493 	sbc	a,b
+   04C4 D2 D1 04           1494 	jp	nc,00108$
+                           1495 ;	pongone.c 191
+                           1496 ;	genAssign
+                           1497 ;	AOP_HL for _paddle_speed
+   04C7 21 D2 01           1498 	ld	hl,#_paddle_speed
+   04CA 4E                 1499 	ld	c,(hl)
+   04CB 23                 1500 	inc	hl
+   04CC 46                 1501 	ld	b,(hl)
+                           1502 ;	genCast
+                           1503 ;	AOP_HL for _paddle_vel_x
+   04CD 21 0F 00           1504 	ld	hl,#_paddle_vel_x
+   04D0 71                 1505 	ld	(hl),c
+                           1506 ;	genLabel
+   04D1                    1507 00108$:
+                           1508 ;	pongone.c 195
+                           1509 ;	genAnd
+                           1510 ;	AOP_HL for _key
+   04D1 21 06 00           1511 	ld	hl,#_key
+   04D4 7E                 1512 	ld	a,(hl)
+   04D5 E6 10              1513 	and	a,#0x10
+   04D7 20 03              1514 	jr	nz,00125$
+   04D9 C3 0C 05           1515 	jp	00113$
+   04DC                    1516 00125$:
+                           1517 ;	pongone.c 196
+                           1518 ;	genAssign
+                           1519 ;	AOP_HL for _game_started
+   04DC 21 09 00           1520 	ld	hl,#_game_started
+   04DF 36 01              1521 	ld	(hl),#0x01
+   04E1 23                 1522 	inc	hl
+   04E2 36 00              1523 	ld	(hl),#0x00
+                           1524 ;	pongone.c 197
+                           1525 ;	genIpush
+                           1526 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+   04E4 21 01 00           1527 	ld	hl,#0x0001
+   04E7 E5                 1528 	push	hl
+                           1529 ;	genCall
+   04E8 CD DA 01           1530 	call	_set_ball
+   04EB E8 02              1531 	lda	sp,2(sp)
+                           1532 ;	pongone.c 198
+                           1533 ;	genCmpGt
+                           1534 ;	AOP_HL for _lives
+   04ED 1E 80              1535 	ld	e,#0x80
+   04EF 21 08 00           1536 	ld	hl,#_lives + 1
+   04F2 7E                 1537 	ld	a,(hl)
+   04F3 EE 80              1538 	xor	a,#0x80
+   04F5 57                 1539 	ld	d,a
+   04F6 3E 00              1540 	ld	a,#0x00
+   04F8 2B                 1541 	dec	hl
+   04F9 96                 1542 	sub	a,(hl)
+   04FA 7B                 1543 	ld	a,e
+   04FB 9A                 1544 	sbc	a,d
+   04FC DA 0C 05           1545 	jp	c,00113$
+                           1546 ;	pongone.c 199
+                           1547 ;	genAssign
+                           1548 ;	AOP_HL for _INITIAL_LIVES
+                           1549 ;	AOP_HL for _lives
+   04FF 21 CC 01           1550 	ld	hl,#_INITIAL_LIVES
+   0502 2A                 1551 	ld	a,(hl+)
+   0503 5E                 1552 	ld	e,(hl)
+   0504 21 07 00           1553 	ld	hl,#_lives
+   0507 22                 1554 	ld	(hl+),a
+   0508 73                 1555 	ld	(hl),e
+                           1556 ;	pongone.c 200
+                           1557 ;	genCall
+                           1558 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+   0509 CD 89 02           1559 	call	_set_lives
+                           1560 ;	genLabel
+   050C                    1561 00113$:
+                           1562 ;	genEndFunction
+   050C E8 02              1563 	lda	sp,2(sp)
+   050E C9                 1564 	ret
+   050F                    1565 ___input_end:
+                           1566 ;	pongone.c 205
+                           1567 ;	genLabel
+                           1568 ;	genFunction
+                           1569 ;	---------------------------------
+                           1570 ; Function physics
+                           1571 ; ---------------------------------
+   050F                    1572 ___physics_start:
+   050F                    1573 _physics:
+                           1574 	
+                           1575 ;	pongone.c 208
+                           1576 ;	genAnd
+                           1577 ;	AOP_HL for _key
+   050F 21 06 00           1578 	ld	hl,#_key
+   0512 7E                 1579 	ld	a,(hl)
+   0513 E6 03              1580 	and	a,#0x03
+   0515 20 03              1581 	jr	nz,00106$
+   0517 C3 26 05           1582 	jp	00102$
+   051A                    1583 00106$:
+                           1584 ;	pongone.c 209
+                           1585 ;	genPlus
+                           1586 ;	AOP_HL for _paddle_x
+                           1587 ;	AOP_HL for _paddle_vel_x
+                           1588 ;	Can't optimise plus by inc, falling back to the normal way
+   051A 21 0D 00           1589 	ld	hl,#_paddle_x
+   051D 7E                 1590 	ld	a,(hl)
+   051E 21 0F 00           1591 	ld	hl,#_paddle_vel_x
+   0521 86                 1592 	add	a,(hl)
+   0522 21 0D 00           1593 	ld	hl,#_paddle_x
+   0525 77                 1594 	ld	(hl),a
+                           1595 ;	genLabel
+   0526                    1596 00102$:
+                           1597 ;	pongone.c 212
+                           1598 ;	genPlus
+                           1599 ;	AOP_HL for _ball_x
+                           1600 ;	AOP_HL for _ball_vel_x
+                           1601 ;	Can't optimise plus by inc, falling back to the normal way
+   0526 21 11 00           1602 	ld	hl,#_ball_x
+   0529 7E                 1603 	ld	a,(hl)
+   052A 21 13 00           1604 	ld	hl,#_ball_vel_x
+   052D 86                 1605 	add	a,(hl)
+   052E 21 11 00           1606 	ld	hl,#_ball_x
+   0531 77                 1607 	ld	(hl),a
+                           1608 ;	pongone.c 213
+                           1609 ;	genPlus
+                           1610 ;	AOP_HL for _ball_y
+                           1611 ;	AOP_HL for _ball_vel_y
+                           1612 ;	Can't optimise plus by inc, falling back to the normal way
+   0532 21 12 00           1613 	ld	hl,#_ball_y
+   0535 7E                 1614 	ld	a,(hl)
+   0536 21 14 00           1615 	ld	hl,#_ball_vel_y
+   0539 86                 1616 	add	a,(hl)
+   053A 21 12 00           1617 	ld	hl,#_ball_y
+   053D 77                 1618 	ld	(hl),a
+                           1619 ;	genLabel
+   053E                    1620 00103$:
+                           1621 ;	genEndFunction
+                           1622 	
+   053E C9                 1623 	ret
+   053F                    1624 ___physics_end:
+                           1625 ;	pongone.c 216
+                           1626 ;	genLabel
+                           1627 ;	genFunction
+                           1628 ;	---------------------------------
+                           1629 ; Function collide
+                           1630 ; ---------------------------------
+   053F                    1631 ___collide_start:
+   053F                    1632 _collide:
+   053F E8 FC              1633 	lda	sp,-4(sp)
+                           1634 ;	pongone.c 219
+                           1635 ;	genCast
+                           1636 ;	AOP_HL for _paddle_x
+                           1637 ;	AOP_STK for _collide_sloc0_1_0
+   0541 21 0D 00           1638 	ld	hl,#_paddle_x
+   0544 7E                 1639 	ld	a,(hl)
+   0545 F8 02              1640 	lda	hl,2(sp)
+   0547 22                 1641 	ld	(hl+),a
+   0548 36 00              1642 	ld	(hl),#0x00
+                           1643 ;	genAssign
+                           1644 ;	AOP_HL for _SCREEN_WIDTH
+   054A 21 00 00           1645 	ld	hl,#_SCREEN_WIDTH
+   054D 4E                 1646 	ld	c,(hl)
+   054E 23                 1647 	inc	hl
+   054F 46                 1648 	ld	b,(hl)
+                           1649 ;	genCmpLt
+                           1650 ;	AOP_STK for _collide_sloc0_1_0
+   0550 F8 02              1651 	lda	hl,2(sp)
+   0552 7E                 1652 	ld	a,(hl)
+   0553 91                 1653 	sub	a,c
+   0554 23                 1654 	inc	hl
+   0555 7E                 1655 	ld	a,(hl)
+   0556 98                 1656 	sbc	a,b
+   0557 DA 5F 05           1657 	jp	c,00102$
+                           1658 ;	pongone.c 220
+                           1659 ;	genAssign
+                           1660 ;	AOP_HL for _paddle_vel_x
+   055A 21 0F 00           1661 	ld	hl,#_paddle_vel_x
+   055D 36 00              1662 	ld	(hl),#0x00
+                           1663 ;	genLabel
+   055F                    1664 00102$:
+                           1665 ;	pongone.c 222
+                           1666 ;	genCmpGt
+                           1667 ;	AOP_HL for _paddle_x
+   055F 3E 00              1668 	ld	a,#0x00
+   0561 21 0D 00           1669 	ld	hl,#_paddle_x
+   0564 96                 1670 	sub	a,(hl)
+   0565 DA 6D 05           1671 	jp	c,00104$
+                           1672 ;	pongone.c 223
+                           1673 ;	genAssign
+                           1674 ;	AOP_HL for _paddle_vel_x
+   0568 21 0F 00           1675 	ld	hl,#_paddle_vel_x
+   056B 36 00              1676 	ld	(hl),#0x00
+                           1677 ;	genLabel
+   056D                    1678 00104$:
+                           1679 ;	pongone.c 232
+                           1680 ;	genMinus
+                           1681 ;	AOP_HL for _SCREEN_HEIGHT
+   056D 21 02 00           1682 	ld	hl,#_SCREEN_HEIGHT
+   0570 7E                 1683 	ld	a,(hl)
+   0571 C6 FC              1684 	add	a,#0xFC
+   0573 4F                 1685 	ld	c,a
+   0574 23                 1686 	inc	hl
+   0575 7E                 1687 	ld	a,(hl)
+   0576 CE FF              1688 	adc	a,#0xFF
+   0578 47                 1689 	ld	b,a
+                           1690 ;	genCast
+                           1691 ;	AOP_HL for _ball_y
+                           1692 ;	AOP_STK for _collide_sloc0_1_0
+   0579 21 12 00           1693 	ld	hl,#_ball_y
+   057C 7E                 1694 	ld	a,(hl)
+   057D F8 02              1695 	lda	hl,2(sp)
+   057F 22                 1696 	ld	(hl+),a
+   0580 36 00              1697 	ld	(hl),#0x00
+                           1698 ;	genCmpLt
+                           1699 ;	AOP_STK for _collide_sloc0_1_0
+   0582 2B                 1700 	dec	hl
+   0583 7E                 1701 	ld	a,(hl)
+   0584 91                 1702 	sub	a,c
+   0585 23                 1703 	inc	hl
+   0586 7E                 1704 	ld	a,(hl)
+   0587 98                 1705 	sbc	a,b
+   0588 DA B0 05           1706 	jp	c,00111$
+                           1707 ;	pongone.c 234
+                           1708 ;	genMinus
+                           1709 ;	AOP_HL for _ball_x
+   058B 21 11 00           1710 	ld	hl,#_ball_x
+   058E 7E                 1711 	ld	a,(hl)
+   058F C6 FB              1712 	add	a,#0xFB
+                           1713 ;	genCmpGt
+                           1714 ;	AOP_HL for _paddle_x
+   0591 4F                 1715 	ld	c,a
+   0592 21 0D 00           1716 	ld	hl,#_paddle_x
+   0595 96                 1717 	sub	a,(hl)
+   0596 D2 C5 05           1718 	jp	nc,00112$
+                           1719 ;	pongone.c 236
+                           1720 ;	genPlus
+                           1721 ;	AOP_HL for _ball_x
+                           1722 ;	genPlusIncr
+                           1723 ;	Can't optimise plus by inc, falling back to the normal way
+   0599 21 11 00           1724 	ld	hl,#_ball_x
+   059C 7E                 1725 	ld	a,(hl)
+   059D C6 05              1726 	add	a,#0x05
+   059F 4F                 1727 	ld	c,a
+                           1728 ;	genCmpLt
+                           1729 ;	AOP_HL for _paddle_x
+   05A0 21 0D 00           1730 	ld	hl,#_paddle_x
+   05A3 7E                 1731 	ld	a,(hl)
+   05A4 91                 1732 	sub	a,c
+   05A5 D2 C5 05           1733 	jp	nc,00112$
+                           1734 ;	pongone.c 237
+                           1735 ;	genAssign
+                           1736 ;	AOP_HL for _ball_vel_y
+   05A8 21 14 00           1737 	ld	hl,#_ball_vel_y
+   05AB 36 FF              1738 	ld	(hl),#0xFF
+                           1739 ;	genGoto
+   05AD C3 C5 05           1740 	jp	00112$
+                           1741 ;	genLabel
+   05B0                    1742 00111$:
+                           1743 ;	pongone.c 240
+                           1744 ;	genAssign
+                           1745 ;	AOP_HL for _SPRITE_SIZE
+   05B0 21 04 00           1746 	ld	hl,#_SPRITE_SIZE
+   05B3 4E                 1747 	ld	c,(hl)
+   05B4 23                 1748 	inc	hl
+   05B5 46                 1749 	ld	b,(hl)
+                           1750 ;	genCmpGt
+                           1751 ;	AOP_STK for _collide_sloc0_1_0
+   05B6 79                 1752 	ld	a,c
+   05B7 F8 02              1753 	lda	hl,2(sp)
+   05B9 96                 1754 	sub	a,(hl)
+   05BA 78                 1755 	ld	a,b
+   05BB 23                 1756 	inc	hl
+   05BC 9E                 1757 	sbc	a,(hl)
+   05BD DA C5 05           1758 	jp	c,00112$
+                           1759 ;	pongone.c 241
+                           1760 ;	genAssign
+                           1761 ;	AOP_HL for _ball_vel_y
+   05C0 21 14 00           1762 	ld	hl,#_ball_vel_y
+   05C3 36 01              1763 	ld	(hl),#0x01
+                           1764 ;	genLabel
+   05C5                    1765 00112$:
+                           1766 ;	pongone.c 244
+                           1767 ;	genMinus
+                           1768 ;	AOP_HL for _SPRITE_SIZE
+   05C5 21 04 00           1769 	ld	hl,#_SPRITE_SIZE
+   05C8 7E                 1770 	ld	a,(hl)
+   05C9 C6 FC              1771 	add	a,#0xFC
+   05CB 4F                 1772 	ld	c,a
+   05CC 23                 1773 	inc	hl
+   05CD 7E                 1774 	ld	a,(hl)
+   05CE CE FF              1775 	adc	a,#0xFF
+   05D0 47                 1776 	ld	b,a
+                           1777 ;	genPlus
+                           1778 ;	AOP_HL for _SCREEN_HEIGHT
+                           1779 ;	Can't optimise plus by inc, falling back to the normal way
+   05D1 21 02 00           1780 	ld	hl,#_SCREEN_HEIGHT
+   05D4 7E                 1781 	ld	a,(hl)
+   05D5 81                 1782 	add	a,c
+   05D6 4F                 1783 	ld	c,a
+   05D7 23                 1784 	inc	hl
+   05D8 7E                 1785 	ld	a,(hl)
+   05D9 88                 1786 	adc	a,b
+   05DA 47                 1787 	ld	b,a
+                           1788 ;	genCmpLt
+                           1789 ;	AOP_STK for _collide_sloc0_1_0
+   05DB F8 02              1790 	lda	hl,2(sp)
+   05DD 7E                 1791 	ld	a,(hl)
+   05DE 91                 1792 	sub	a,c
+   05DF 23                 1793 	inc	hl
+   05E0 7E                 1794 	ld	a,(hl)
+   05E1 98                 1795 	sbc	a,b
+   05E2 DA 21 06           1796 	jp	c,00116$
+                           1797 ;	pongone.c 245
+                           1798 ;	genMinus
+                           1799 ;	AOP_HL for _lives
+   05E5 21 07 00           1800 	ld	hl,#_lives
+   05E8 5E                 1801 	ld	e,(hl)
+   05E9 23                 1802 	inc	hl
+   05EA 56                 1803 	ld	d,(hl)
+   05EB 1B                 1804 	dec	de
+   05EC 2B                 1805 	dec	hl
+   05ED 73                 1806 	ld	(hl),e
+   05EE 23                 1807 	inc	hl
+   05EF 72                 1808 	ld	(hl),d
+                           1809 ;	pongone.c 246
+                           1810 ;	genCall
+                           1811 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+   05F0 CD 00 00           1812 	call	_set_paddle
+                           1813 ;	pongone.c 247
+                           1814 ;	genIpush
+                           1815 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+   05F3 21 01 00           1816 	ld	hl,#0x0001
+   05F6 E5                 1817 	push	hl
+                           1818 ;	genCall
+   05F7 CD DA 01           1819 	call	_set_ball
+   05FA E8 02              1820 	lda	sp,2(sp)
+                           1821 ;	pongone.c 248
+                           1822 ;	genCall
+                           1823 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+   05FC CD 89 02           1824 	call	_set_lives
+                           1825 ;	pongone.c 249
+                           1826 ;	genAssign
+                           1827 ;	AOP_HL for _game_started
+   05FF 21 09 00           1828 	ld	hl,#_game_started
+   0602 36 00              1829 	ld	(hl),#0x00
+   0604 23                 1830 	inc	hl
+   0605 36 00              1831 	ld	(hl),#0x00
+                           1832 ;	pongone.c 250
+                           1833 ;	genCmpGt
+                           1834 ;	AOP_HL for _lives
+   0607 1E 80              1835 	ld	e,#0x80
+   0609 21 08 00           1836 	ld	hl,#_lives + 1
+   060C 7E                 1837 	ld	a,(hl)
+   060D EE 80              1838 	xor	a,#0x80
+   060F 57                 1839 	ld	d,a
+   0610 3E 00              1840 	ld	a,#0x00
+   0612 2B                 1841 	dec	hl
+   0613 96                 1842 	sub	a,(hl)
+   0614 7B                 1843 	ld	a,e
+   0615 9A                 1844 	sbc	a,d
+   0616 DA 21 06           1845 	jp	c,00116$
+                           1846 ;	pongone.c 251
+                           1847 ;	genAssign
+                           1848 ;	AOP_HL for _game_over
+   0619 21 0B 00           1849 	ld	hl,#_game_over
+   061C 36 01              1850 	ld	(hl),#0x01
+   061E 23                 1851 	inc	hl
+   061F 36 00              1852 	ld	(hl),#0x00
+                           1853 ;	genLabel
+   0621                    1854 00116$:
+                           1855 ;	pongone.c 255
+                           1856 ;	genRightShift
+                           1857 ;	AOP_HL for _SPRITE_SIZE
+   0621 21 04 00           1858 	ld	hl,#_SPRITE_SIZE
+   0624 4E                 1859 	ld	c,(hl)
+   0625 23                 1860 	inc	hl
+   0626 46                 1861 	ld	b,(hl)
+   0627 CB 28              1862 	sra	b
+   0629 CB 19              1863 	rr	c
+                           1864 ;	genMinus
+                           1865 ;	AOP_HL for _SCREEN_WIDTH
+                           1866 ;	AOP_STK for _collide_sloc0_1_0
+   062B 21 00 00           1867 	ld	hl,#_SCREEN_WIDTH
+   062E 5E                 1868 	ld	e,(hl)
+   062F 23                 1869 	inc	hl
+   0630 56                 1870 	ld	d,(hl)
+                           1871 ; Removed redundent load
+                           1872 ; Removed redundent load
+   0631 7B                 1873 	ld	a,e
+   0632 91                 1874 	sub	a,c
+   0633 5F                 1875 	ld	e,a
+   0634 7A                 1876 	ld	a,d
+   0635 98                 1877 	sbc	a,b
+   0636 F8 03              1878 	lda	hl,3(sp)
+   0638 32                 1879 	ld      (hl-),a
+   0639 73                 1880 	ld	(hl),e
+                           1881 ;	genCast
+                           1882 ;	AOP_HL for _ball_x
+                           1883 ;	AOP_STK for _collide_sloc1_1_0
+   063A 21 11 00           1884 	ld	hl,#_ball_x
+   063D 7E                 1885 	ld	a,(hl)
+   063E F8 00              1886 	lda	hl,0(sp)
+   0640 22                 1887 	ld	(hl+),a
+   0641 36 00              1888 	ld	(hl),#0x00
+                           1889 ;	genCmpLt
+                           1890 ;	AOP_STK for _collide_sloc1_1_0
+                           1891 ;	AOP_STK for _collide_sloc0_1_0
+   0643 2B                 1892 	dec	hl
+   0644 2A                 1893 	ld	a,(hl+)
+   0645 23                 1894 	inc	hl
+   0646 96                 1895 	sub	a,(hl)
+   0647 2B                 1896 	dec	hl
+   0648 2A                 1897 	ld	a,(hl+)
+   0649 23                 1898 	inc	hl
+   064A 9E                 1899 	sbc	a,(hl)
+   064B DA 56 06           1900 	jp	c,00120$
+                           1901 ;	pongone.c 256
+                           1902 ;	genAssign
+                           1903 ;	AOP_HL for _ball_vel_x
+   064E 21 13 00           1904 	ld	hl,#_ball_vel_x
+   0651 36 FF              1905 	ld	(hl),#0xFF
+                           1906 ;	genGoto
+   0653 C3 65 06           1907 	jp	00122$
+                           1908 ;	genLabel
+   0656                    1909 00120$:
+                           1910 ;	pongone.c 258
+                           1911 ;	genAssign
+                           1912 ;	(registers are the same)
+                           1913 ;	genCmpGt
+                           1914 ;	AOP_STK for _collide_sloc1_1_0
+   0656 79                 1915 	ld	a,c
+   0657 F8 00              1916 	lda	hl,0(sp)
+   0659 96                 1917 	sub	a,(hl)
+   065A 78                 1918 	ld	a,b
+   065B 23                 1919 	inc	hl
+   065C 9E                 1920 	sbc	a,(hl)
+   065D DA 65 06           1921 	jp	c,00122$
+                           1922 ;	pongone.c 259
+                           1923 ;	genAssign
+                           1924 ;	AOP_HL for _ball_vel_x
+   0660 21 13 00           1925 	ld	hl,#_ball_vel_x
+   0663 36 01              1926 	ld	(hl),#0x01
+                           1927 ;	genLabel
+   0665                    1928 00122$:
+                           1929 ;	genEndFunction
+   0665 E8 04              1930 	lda	sp,4(sp)
+   0667 C9                 1931 	ret
+   0668                    1932 ___collide_end:
+                           1933 ;	pongone.c 263
+                           1934 ;	genLabel
+                           1935 ;	genFunction
+                           1936 ;	---------------------------------
+                           1937 ; Function move
+                           1938 ; ---------------------------------
+   0668                    1939 ___move_start:
+   0668                    1940 _move:
+                           1941 	
+                           1942 ;	pongone.c 266
+                           1943 ;	genIpush
+                           1944 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+                           1945 ;	AOP_HL for _paddle_y
+   0668 21 0E 00           1946 	ld	hl,#_paddle_y
+   066B 7E                 1947 	ld	a,(hl)
+   066C F5                 1948 	push	af
+   066D 33                 1949 	inc	sp
+                           1950 ;	genIpush
+                           1951 ;	AOP_HL for _paddle_x
+   066E 21 0D 00           1952 	ld	hl,#_paddle_x
+   0671 7E                 1953 	ld	a,(hl)
+   0672 F5                 1954 	push	af
+   0673 33                 1955 	inc	sp
+                           1956 ;	genIpush
+   0674 3E 00              1957 	ld	a,#0x00
+   0676 F5                 1958 	push	af
+   0677 33                 1959 	inc	sp
+                           1960 ;	genCall
+   0678 CD 00 00           1961 	call	_move_sprite
+   067B E8 03              1962 	lda	sp,3(sp)
+                           1963 ;	pongone.c 267
+                           1964 ;	genPlus
+                           1965 ;	AOP_HL for _paddle_x
+                           1966 ;	genPlusIncr
+                           1967 ;	Can't optimise plus by inc, falling back to the normal way
+   067D 21 0D 00           1968 	ld	hl,#_paddle_x
+   0680 7E                 1969 	ld	a,(hl)
+   0681 C6 08              1970 	add	a,#0x08
+   0683 4F                 1971 	ld	c,a
+                           1972 ;	genIpush
+                           1973 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+                           1974 ;	AOP_HL for _paddle_y
+   0684 21 0E 00           1975 	ld	hl,#_paddle_y
+   0687 7E                 1976 	ld	a,(hl)
+   0688 F5                 1977 	push	af
+   0689 33                 1978 	inc	sp
+                           1979 ;	genIpush
+   068A 79                 1980 	ld	a,c
+   068B F5                 1981 	push	af
+   068C 33                 1982 	inc	sp
+                           1983 ;	genIpush
+   068D 3E 01              1984 	ld	a,#0x01
+   068F F5                 1985 	push	af
+   0690 33                 1986 	inc	sp
+                           1987 ;	genCall
+   0691 CD 00 00           1988 	call	_move_sprite
+   0694 E8 03              1989 	lda	sp,3(sp)
+                           1990 ;	pongone.c 269
+                           1991 ;	genIpush
+                           1992 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+                           1993 ;	AOP_HL for _ball_y
+   0696 21 12 00           1994 	ld	hl,#_ball_y
+   0699 7E                 1995 	ld	a,(hl)
+   069A F5                 1996 	push	af
+   069B 33                 1997 	inc	sp
+                           1998 ;	genIpush
+                           1999 ;	AOP_HL for _ball_x
+   069C 21 11 00           2000 	ld	hl,#_ball_x
+   069F 7E                 2001 	ld	a,(hl)
+   06A0 F5                 2002 	push	af
+   06A1 33                 2003 	inc	sp
+                           2004 ;	genIpush
+   06A2 3E 02              2005 	ld	a,#0x02
+   06A4 F5                 2006 	push	af
+   06A5 33                 2007 	inc	sp
+                           2008 ;	genCall
+   06A6 CD 00 00           2009 	call	_move_sprite
+   06A9 E8 03              2010 	lda	sp,3(sp)
+                           2011 ;	pongone.c 270
+                           2012 ;	genPlus
+                           2013 ;	AOP_HL for _ball_x
+                           2014 ;	genPlusIncr
+                           2015 ;	Can't optimise plus by inc, falling back to the normal way
+   06AB 21 11 00           2016 	ld	hl,#_ball_x
+   06AE 7E                 2017 	ld	a,(hl)
+   06AF C6 08              2018 	add	a,#0x08
+   06B1 4F                 2019 	ld	c,a
+                           2020 ;	genIpush
+                           2021 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+                           2022 ;	AOP_HL for _ball_y
+   06B2 21 12 00           2023 	ld	hl,#_ball_y
+   06B5 7E                 2024 	ld	a,(hl)
+   06B6 F5                 2025 	push	af
+   06B7 33                 2026 	inc	sp
+                           2027 ;	genIpush
+   06B8 79                 2028 	ld	a,c
+   06B9 F5                 2029 	push	af
+   06BA 33                 2030 	inc	sp
+                           2031 ;	genIpush
+   06BB 3E 03              2032 	ld	a,#0x03
+   06BD F5                 2033 	push	af
+   06BE 33                 2034 	inc	sp
+                           2035 ;	genCall
+   06BF CD 00 00           2036 	call	_move_sprite
+   06C2 E8 03              2037 	lda	sp,3(sp)
+                           2038 ;	genLabel
+   06C4                    2039 00101$:
+                           2040 ;	genEndFunction
+                           2041 	
+   06C4 C9                 2042 	ret
+   06C5                    2043 ___move_end:
+                           2044 ;	pongone.c 273
+                           2045 ;	genLabel
+                           2046 ;	genFunction
+                           2047 ;	---------------------------------
+                           2048 ; Function score
+                           2049 ; ---------------------------------
+   06C5                    2050 ___score_start:
+   06C5                    2051 _score:
+                           2052 	
+                           2053 ;	pongone.c 275
+                           2054 ;	genIfx
+                           2055 ;	AOP_HL for _game_over
+   06C5 21 0B 00           2056 	ld	hl,#_game_over
+   06C8 2A                 2057 	ld	a,(hl+)
+   06C9 B6                 2058 	or	a,(hl)
+   06CA CA E9 06           2059 	jp	z,00103$
+                           2060 ;	pongone.c 276
+                           2061 ;	genCall
+                           2062 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+   06CD CD 00 00           2063 	call	_set_paddle
+                           2064 ;	pongone.c 277
+                           2065 ;	genIpush
+                           2066 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+   06D0 21 00 00           2067 	ld	hl,#0x0000
+   06D3 E5                 2068 	push	hl
+                           2069 ;	genCall
+   06D4 CD DA 01           2070 	call	_set_ball
+   06D7 E8 02              2071 	lda	sp,2(sp)
+                           2072 ;	pongone.c 278
+                           2073 ;	genAssign
+                           2074 ;	AOP_HL for _game_started
+   06D9 21 09 00           2075 	ld	hl,#_game_started
+   06DC 36 00              2076 	ld	(hl),#0x00
+   06DE 23                 2077 	inc	hl
+   06DF 36 00              2078 	ld	(hl),#0x00
+                           2079 ;	pongone.c 279
+                           2080 ;	genAssign
+                           2081 ;	AOP_HL for _game_over
+   06E1 21 0B 00           2082 	ld	hl,#_game_over
+   06E4 36 00              2083 	ld	(hl),#0x00
+   06E6 23                 2084 	inc	hl
+   06E7 36 00              2085 	ld	(hl),#0x00
+                           2086 ;	genLabel
+   06E9                    2087 00103$:
+                           2088 ;	genEndFunction
+                           2089 	
+   06E9 C9                 2090 	ret
+   06EA                    2091 ___score_end:
+                           2092 ;	pongone.c 283
+                           2093 ;	genLabel
+                           2094 ;	genFunction
+                           2095 ;	---------------------------------
+                           2096 ; Function run
+                           2097 ; ---------------------------------
+   06EA                    2098 ___run_start:
+   06EA                    2099 _run:
+   06EA E8 FD              2100 	lda	sp,-3(sp)
+                           2101 ;	pongone.c 285
+                           2102 ;	genLabel
+   06EC                    2103 00104$:
+                           2104 ;	pongone.c 286
+                           2105 ;	genCall
+                           2106 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+   06EC CD 00 00           2107 	call	_wait_vbl_done
+                           2108 ;	pongone.c 288
+                           2109 ;	genCall
+                           2110 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+   06EF CD 00 00           2111 	call	_joypad
+                           2112 ;	AOP_HL for _key
+   06F2 21 06 00           2113 	ld	hl,#_key
+   06F5 73                 2114 	ld	(hl),e
+                           2115 ;	pongone.c 290
+                           2116 ;	genCall
+                           2117 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+   06F6 CD 54 04           2118 	call	_input
+                           2119 ;	pongone.c 291
+                           2120 ;	genIfx
+                           2121 ;	AOP_HL for _game_started
+   06F9 21 09 00           2122 	ld	hl,#_game_started
+   06FC 2A                 2123 	ld	a,(hl+)
+   06FD B6                 2124 	or	a,(hl)
+   06FE CA 0D 07           2125 	jp	z,00102$
+                           2126 ;	pongone.c 292
+                           2127 ;	genCall
+                           2128 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+   0701 CD 0F 05           2129 	call	_physics
+                           2130 ;	pongone.c 293
+                           2131 ;	genCall
+                           2132 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+   0704 CD 3F 05           2133 	call	_collide
+                           2134 ;	pongone.c 294
+                           2135 ;	genCall
+                           2136 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+   0707 CD 68 06           2137 	call	_move
+                           2138 ;	pongone.c 295
+                           2139 ;	genCall
+                           2140 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+   070A CD C5 06           2141 	call	_score
+                           2142 ;	genLabel
+   070D                    2143 00102$:
+                           2144 ;	pongone.c 298
+                           2145 ;	genAssign
+   070D 01 40 FF           2146 	ld	bc,#0xFF40
+                           2147 ;	genAssign
+                           2148 ;	AOP_STK for _run_sloc0_1_0
+   0710 F8 01              2149 	lda	hl,1(sp)
+   0712 36 40              2150 	ld	(hl),#0x40
+   0714 23                 2151 	inc	hl
+   0715 36 FF              2152 	ld	(hl),#0xFF
+                           2153 ;	genPointerGet
+                           2154 ;	AOP_STK for _run_sloc0_1_0
+                           2155 ;	AOP_STK for _run_sloc1_1_0
+   0717 2B                 2156 	dec	hl
+   0718 5E                 2157 	ld	e,(hl)
+   0719 23                 2158 	inc	hl
+   071A 56                 2159 	ld	d,(hl)
+   071B 1A                 2160 	ld	a,(de)
+   071C 2B                 2161 	dec	hl
+   071D 2B                 2162 	dec	hl
+                           2163 ;	genOr
+                           2164 ;	AOP_STK for _run_sloc1_1_0
+   071E 77                 2165 	ld      (hl),a
+                           2166 ; Removed redundent load
+   071F F6 02              2167 	or	a,#0x02
+                           2168 ;	genAssign (pointer)
+   0721 02                 2169 	ld	(bc),a
+                           2170 ;	genGoto
+   0722 C3 EC 06           2171 	jp	00104$
+                           2172 ;	genLabel
+   0725                    2173 00106$:
+                           2174 ;	genEndFunction
+   0725 E8 03              2175 	lda	sp,3(sp)
+   0727 C9                 2176 	ret
+   0728                    2177 ___run_end:
+                           2178 ;	pongone.c 302
+                           2179 ;	genLabel
+                           2180 ;	genFunction
+                           2181 ;	---------------------------------
+                           2182 ; Function main
+                           2183 ; ---------------------------------
+   0728                    2184 ___main_start:
+   0728                    2185 _main:
+   0728 E8 FD              2186 	lda	sp,-3(sp)
+                           2187 ;	pongone.c 305
+                           2188 ;	genAssign
+   072A 01 49 FF           2189 	ld	bc,#0xFF49
+                           2190 ;	genAssign (pointer)
+   072D 3E E0              2191 	ld	a,#0xE0
+   072F 02                 2192 	ld	(bc),a
+                           2193 ;	pongone.c 307
+                           2194 ;	genAssign
+   0730 01 40 FF           2195 	ld	bc,#0xFF40
+                           2196 ;	genAssign
+                           2197 ;	AOP_STK for _main_sloc0_1_0
+   0733 F8 01              2198 	lda	hl,1(sp)
+   0735 36 40              2199 	ld	(hl),#0x40
+   0737 23                 2200 	inc	hl
+   0738 36 FF              2201 	ld	(hl),#0xFF
+                           2202 ;	genPointerGet
+                           2203 ;	AOP_STK for _main_sloc0_1_0
+                           2204 ;	AOP_STK for _main_sloc1_1_0
+   073A 2B                 2205 	dec	hl
+   073B 5E                 2206 	ld	e,(hl)
+   073C 23                 2207 	inc	hl
+   073D 56                 2208 	ld	d,(hl)
+   073E 1A                 2209 	ld	a,(de)
+   073F 2B                 2210 	dec	hl
+   0740 2B                 2211 	dec	hl
+                           2212 ;	genOr
+                           2213 ;	AOP_STK for _main_sloc1_1_0
+   0741 77                 2214 	ld      (hl),a
+   0742 7F                 2215 	ld      a,a
+   0743 F6 04              2216 	or	a,#0x04
+                           2217 ;	genAssign (pointer)
+   0745 02                 2218 	ld	(bc),a
+                           2219 ;	pongone.c 309
+                           2220 ;	genCall
+                           2221 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+   0746 CD 00 00           2222 	call	_set_paddle
+                           2223 ;	pongone.c 310
+                           2224 ;	genIpush
+                           2225 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+   0749 21 01 00           2226 	ld	hl,#0x0001
+   074C E5                 2227 	push	hl
+                           2228 ;	genCall
+   074D CD DA 01           2229 	call	_set_ball
+   0750 E8 02              2230 	lda	sp,2(sp)
+                           2231 ;	pongone.c 311
+                           2232 ;	genCall
+                           2233 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+   0752 CD 89 02           2234 	call	_set_lives
+                           2235 ;	pongone.c 312
+                           2236 ;	genCall
+                           2237 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+   0755 CD EA 06           2238 	call	_run
+                           2239 ;	genLabel
+   0758                    2240 00101$:
+                           2241 ;	genEndFunction
+   0758 E8 03              2242 	lda	sp,3(sp)
+   075A C9                 2243 	ret
+   075B                    2244 ___main_end:
+                           2245 	.area _CODE
+ASxxxx Assembler V01.75  (GameBoy Z80-like CPU), page 1.
+
+Symbol Table
+
+  0 _INITIAL_LIVES                     01CC GR
+  1 _SCREEN_HEIGHT                     0002 GR
+  1 _SCREEN_WIDTH                      0000 GR
+  1 _SPRITE_SIZE                       0004 GR
+  0 ___collide_end                     0668 R
+  0 ___collide_start                   053F R
+  0 ___input_end                       050F R
+  0 ___input_start                     0454 R
+  0 ___main_end                        075B R
+  0 ___main_start                      0728 R
+  0 ___move_end                        06C5 R
+  0 ___move_start                      0668 R
+  0 ___physics_end                     053F R
+  0 ___physics_start                   050F R
+  0 ___run_end                         0728 R
+  0 ___run_start                       06EA R
+  0 ___score_end                       06EA R
+  0 ___score_start                     06C5 R
+  0 ___set_ball_end                    0289 R
+  0 ___set_ball_start                  01DA R
+  0 ___set_lives_end                   0454 R
+  0 ___set_lives_start                 0289 R
+  0 ___set_paddle_end                  008C R
+  0 ___set_paddle_start                0000 R
+  0 _ball_sprite_data                  00CC GR
+  0 _ball_sprite_left                  01D4 GR
+  0 _ball_sprite_right                 01D6 GR
+  1 _ball_vel_x                        0013 GR
+  1 _ball_vel_y                        0014 GR
+  1 _ball_x                            0011 GR
+  1 _ball_y                            0012 GR
+  0 _block_sprite_data                 018C GR
+  0 _collide                           053F GR
+  0 _death_sprite_data                 014C GR
+  1 _game_over                         000B GR
+  1 _game_started                      0009 GR
+  0 _input                             0454 GR
+    _joypad                            **** GX
+  1 _key                               0006 GR
+  1 _lives                             0007 GR
+  0 _lives_sprite_begin                01D8 GR
+  0 _main                              0728 GR
+  0 _move                              0668 GR
+    _move_sprite                       **** GX
+  0 _paddle_speed                      01D2 GR
+  0 _paddle_sprite_data                008C GR
+  0 _paddle_sprite_left                01CE GR
+  0 _paddle_sprite_right               01D0 GR
+  1 _paddle_vel_x                      000F GR
+  1 _paddle_vel_y                      0010 GR
+  1 _paddle_x                          000D GR
+  1 _paddle_y                          000E GR
+  0 _physics                           050F GR
+  0 _run                               06EA GR
+  0 _score                             06C5 GR
+  0 _set_ball                          01DA GR
+  0 _set_lives                         0289 GR
+  0 _set_paddle                        0000 GR
+    _set_sprite_data                   **** GX
+    _set_sprite_tile                   **** GX
+  0 _smile_sprite_data                 010C GR
+    _wait_vbl_done                     **** GX
+
+ASxxxx Assembler V01.75  (GameBoy Z80-like CPU), page 2.
+
+Area Table
+
+   0 _CODE                              size  75B   flags 0
+   1 _DATA                              size   15   flags 0
+   2 _OVERLAY                           size    0   flags 0
+   3 _ISEG                              size    0   flags 0
+   4 _BSEG                              size    0   flags 0
+   5 _XSEG                              size    0   flags 0
+   6 _GSINIT                            size   32   flags 0
+   7 _GSFINAL                           size    0   flags 0
+   8 _HOME                              size    0   flags 0
