@@ -49,6 +49,19 @@ const unsigned char death_sprite_data[] =
   0xF2,0xF2,0xF8,0xF8,0xF8,0xF8,0xE0,0xE0
 };
 
+const unsigned char block_sprite_data[] =
+{
+  0xFF,0xFF,0xFF,0x80,0xFF,0xBF,0xFF,0xA0,
+  0xFF,0xAF,0xFF,0xA8,0xFF,0xAB,0xFF,0xAA,
+  0xFF,0xAA,0xFF,0xAB,0xFF,0xA8,0xFF,0xAF,
+  0xFF,0xA0,0xFF,0xBF,0xFF,0x80,0xFF,0xFF,
+  0xFF,0xFF,0xFF,0x01,0xFF,0xFD,0xFF,0x05,
+  0xFF,0xF5,0xFF,0x15,0xFF,0xD5,0xFF,0x55,
+  0xFF,0x55,0xFF,0xD5,0xFF,0x15,0xFF,0xF5,
+  0xFF,0x05,0xFF,0xFD,0xFF,0x01,0xFF,0xFF
+};
+
+
 int SCREEN_WIDTH = 160;
 int SCREEN_HEIGHT = 144;
 int SPRITE_SIZE = 16;
@@ -137,6 +150,39 @@ void set_lives()
     set_sprite_tile(b, 26);
     move_sprite(a, 8 + offset, 16);
     move_sprite(b, 8 + 8 + offset, 16);
+  }
+}
+
+int blocks[24];
+
+void set_blocks()
+{
+  int i, j, a, b, offset_x, offset_y;
+  int sp = lives_sprite_begin + (INITIAL_LIVES * 2 * 2);
+
+  set_sprite_data(32, 8, block_sprite_data);
+
+  for (i=0; i<4; i++) {
+    offset_x = i * 16;
+    for (j=0; j<3; j++) {
+      offset_y = j * 16;
+      a = sp++;
+      b = sp++;
+
+      if (i==0 && j==0) {
+        blocks[0] = a;
+        blocks[1] = b;
+      } else {
+        size_t NumberOfElements = sizeof(blocks)/sizeof(blocks[0]);
+        blocks[NumberOfElements] = a;
+        blocks[NumberOfElements + 1] = b;
+      }
+
+      set_sprite_tile(a, 32);
+      set_sprite_tile(b, 34);
+      move_sprite(a, 56 + offset_x, 48 + offset_y);
+      move_sprite(b, 56 + 8 + offset_x, 48 + offset_y);
+    }
   }
 }
 
@@ -266,5 +312,6 @@ void main()
   set_paddle();
   set_ball(1);
   set_lives();
+  set_blocks();
   run();
 }

@@ -1,0 +1,148 @@
+; no$gmb format .sym file
+; Generated automagically by ASxxxx linker V01.75 (SDK 3.0.0)
+; Area: .  .ABS.
+00:0000 s__HEADER
+00:0000 .init
+00:0200 s__CODE
+00:0B3F s__HOME
+00:0CEB s__BASE
+00:0E10 s__LIT
+00:0E10 s__GSINIT
+00:0E42 s__GSINITTAIL
+00:0E43 s__GSFINAL
+00:C000 .OAM
+00:C0A0 s__DATA
+00:C0E5 s__BSS
+00:C13E s__HEAP
+00:C13E s__BSEG
+00:C13E s__ISEG
+00:C13E s__XSEG
+00:C13E s__OVERLAY
+00:E000 .STACK
+00:FF80 .refresh_OAM
+; Area: _CODE
+00:0200 _set_paddle
+00:028C _paddle_sprite_data
+00:02CC _ball_sprite_data
+00:030C _smile_sprite_data
+00:034C _death_sprite_data
+00:038C _block_sprite_data
+00:03CC _INITIAL_LIVES
+00:03CE _paddle_sprite_left
+00:03D0 _paddle_sprite_right
+00:03D2 _paddle_speed
+00:03D4 _ball_sprite_left
+00:03D6 _ball_sprite_right
+00:03D8 _lives_sprite_begin
+00:03DA _set_ball
+00:0489 _set_lives
+00:0654 _set_blocks
+00:083B _input
+00:08F6 _physics
+00:0926 _collide
+00:0A4F _move
+00:0AAC _score
+00:0AD1 _run
+00:0B0F _main
+; Area: _HEADER
+00:01D2 _exit
+; Area: _HOME
+00:0B3F .set_mode
+00:0B4F .remove_VBL
+00:0B55 .remove_LCD
+00:0B5B .remove_TIM
+00:0B61 .remove_SIO
+00:0B67 .remove_JOY
+00:0B6D .add_VBL
+00:0B73 .add_LCD
+00:0B79 .add_TIM
+00:0B7F .add_SIO
+00:0B85 .add_JOY
+00:0B8B .remove_int
+00:0BAB .add_int
+00:0BC7 .wait_vbl_done
+00:0BC7 _wait_vbl_done
+00:0BDE _display_off
+00:0BDE .display_off
+00:0BFF .serial_IO
+00:0C2E _mode
+00:0C37 _get_mode
+00:0C3C _enable_interrupts
+00:0C3E _disable_interrupts
+00:0C40 _reset
+00:0C40 .reset
+00:0C46 _set_interrupts
+00:0C51 _remove_VBL
+00:0C5C _remove_LCD
+00:0C67 _remove_TIM
+00:0C72 _remove_SIO
+00:0C7D _remove_JOY
+00:0C88 _add_VBL
+00:0C93 _add_LCD
+00:0C9E _add_TIM
+00:0CA9 _add_SIO
+00:0CB4 _add_JOY
+00:0CBF _clock
+00:0CC8 __printTStates
+00:0CC9 banked_call
+00:0CE2 banked_ret
+; Area: _BASE
+00:0CEB .mv_sprite
+00:0CFA _move_sprite
+00:0D07 _set_win_data
+00:0D07 _set_bkg_data
+00:0D54 _set_sprite_data
+00:0D83 .padup
+00:0D83 _waitpadup
+00:0D93 .jpad
+00:0DC0 .wait_pad
+00:0DC7 _joypad
+00:0DCC _waitpad
+00:0DD6 .set_sprite_tile
+00:0DE3 _set_sprite_tile
+00:0DEE .copy_vram
+00:0DFD _get_data
+00:0DFD _set_data
+; Area: _LIT
+; Area: _GSINIT
+00:0E10 gsinit
+; Area: _GSINITTAIL
+; Area: _GSFINAL
+; Area: _DATA
+00:C0A0 _SCREEN_WIDTH
+00:C0A2 _SCREEN_HEIGHT
+00:C0A4 _SPRITE_SIZE
+00:C0A6 _key
+00:C0A7 _lives
+00:C0A9 _game_started
+00:C0AB _game_over
+00:C0AD _paddle_x
+00:C0AE _paddle_y
+00:C0AF _paddle_vel_x
+00:C0B0 _paddle_vel_y
+00:C0B1 _ball_x
+00:C0B2 _ball_y
+00:C0B3 _ball_vel_x
+00:C0B4 _ball_vel_y
+00:C0B5 _blocks
+; Area: _BSS
+00:C0E5 __cpu
+00:C0E6 .mode
+00:C0E7 __io_out
+00:C0E8 __io_in
+00:C0E9 __io_status
+00:C0EA .vbl_done
+00:C0EB __current_bank
+00:C0EC _sys_time
+00:C0EC .sys_time
+00:C0EE .int_0x40
+00:C0FE .int_0x48
+00:C10E .int_0x50
+00:C11E .int_0x58
+00:C12E .int_0x60
+; Area: _HEAP
+00:C13E _malloc_heap_start
+; Area: _OVERLAY
+; Area: _ISEG
+; Area: _BSEG
+; Area: _XSEG
