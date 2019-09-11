@@ -1,6 +1,11 @@
 #include <gb/gb.h>
 #include <gb/drawing.h>
 
+static void state_life_start();
+static void state_life_end();
+static void state_blocks_gone();
+static void state_game_over();
+
 const unsigned char paddle_sprite_data[] = 
 { 
   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -84,6 +89,7 @@ UBYTE key;
 int lives = INITIAL_LIVES;
 int game_started = 0;
 int game_over = 0;
+int current_level = 0;
 
 UBYTE paddle_x;
 UBYTE paddle_y;
@@ -129,8 +135,8 @@ void set_ball(int move)
 
   // initial ball movement
   if (move) {
-    ball_vel_y = -1;
-    ball_vel_x = 1;
+    ball_vel_y = -2;
+    // ball_vel_x = 2;
   } else {
     ball_vel_x = 0;
     ball_vel_y = 0;
@@ -168,43 +174,74 @@ void set_lives()
   }
 }
 
-void set_blocks()
-{
+void set_blocks() {
   int i, j, a, b, a_x, b_x, a_y, b_y, offset_x, offset_y;
 
   int sp = lives_sprite_begin + (INITIAL_LIVES * 2 * 2);
   int init_sp = sp;
 
-  int width = 4;
-  int height = 3;
-
   set_sprite_data(32, 8, block_sprite_data);
 
-  for (i=0; i<height; i++) {
-    offset_x = i * 16;
-    for (j=0; j<width; j++) {
-      offset_y = j * 16;
-      a = sp++;
-      b = sp++;
-      a_x = 56 + offset_y;
-      a_y = 48 + offset_x;
-      b_x = 56 + 8 + offset_y;
-      b_y = 48 + offset_x;
+  if (current_level == 0) {
+    int width = 4;
+    int height = 3;
 
-      block_sprites[a - init_sp][0] = a;
-      block_sprites[a - init_sp][1] = a_x;
-      block_sprites[a - init_sp][2] = a_y;
+    for (i=0; i<height; i++) {
+      offset_x = i * 16;
+      for (j=0; j<width; j++) {
+        offset_y = j * 16;
+        a = sp++;
+        b = sp++;
+        a_x = 56 + offset_y;
+        a_y = 48 + offset_x;
+        b_x = 56 + 8 + offset_y;
+        b_y = 48 + offset_x;
 
-      block_sprites[b - init_sp][0] = b;
-      block_sprites[b - init_sp][1] = b_x;
-      block_sprites[b - init_sp][2] = b_y;
+        block_sprites[a - init_sp][0] = a;
+        block_sprites[a - init_sp][1] = a_x;
+        block_sprites[a - init_sp][2] = a_y;
 
-      set_sprite_tile(a, 32);
-      set_sprite_tile(b, 34);
-      move_sprite(a, a_x, a_y);
-      move_sprite(b, b_x, b_y);
+        block_sprites[b - init_sp][0] = b;
+        block_sprites[b - init_sp][1] = b_x;
+        block_sprites[b - init_sp][2] = b_y;
+
+        set_sprite_tile(a, 32);
+        set_sprite_tile(b, 34);
+        move_sprite(a, a_x, a_y);
+        move_sprite(b, b_x, b_y);
+      }
+    }
+  } else if (current_level == 1) {
+    int width = 3;
+    int height = 4;
+
+    for (i=0; i<height; i++) {
+      offset_x = i * 16;
+      for (j=0; j<width; j++) {
+        offset_y = j * 16;
+        a = sp++;
+        b = sp++;
+        a_x = 56 + offset_y;
+        a_y = 48 + offset_x;
+        b_x = 56 + 8 + offset_y;
+        b_y = 48 + offset_x;
+
+        block_sprites[a - init_sp][0] = a;
+        block_sprites[a - init_sp][1] = a_x;
+        block_sprites[a - init_sp][2] = a_y;
+
+        block_sprites[b - init_sp][0] = b;
+        block_sprites[b - init_sp][1] = b_x;
+        block_sprites[b - init_sp][2] = b_y;
+
+        set_sprite_tile(a, 32);
+        set_sprite_tile(b, 34);
+        move_sprite(a, a_x, a_y);
+        move_sprite(b, b_x, b_y);
+      }
     }
   }
+  
 }
 
 void input()
@@ -226,11 +263,7 @@ void input()
   }
 
   if(key & J_A) {
-    game_started = 1;
-    if (lives <= 0) {
-      lives = INITIAL_LIVES;
-      set_lives();
-    }
+    state_life_start();
   }
 }
 
@@ -313,14 +346,14 @@ void collide()
       }
 
       if (hit_top) {
-        ball_vel_y = -1;
+        ball_vel_y = -2;
       } else if (hit_bottom) {
-        ball_vel_y = 1;
+        ball_vel_y = 2;
       }
       if (hit_left) {
-        ball_vel_x = -1;
+        ball_vel_x = -2;
       } else if (hit_right) {
-        ball_vel_x = 1;
+        ball_vel_x = 2;
       }
     }
   }
@@ -334,40 +367,32 @@ void collide()
   }
 
   // ball collision with paddle
-  // if (ball_y >= SCREEN_HEIGHT - (BALL_SIZE / 2)) {
   if (ball_y + 2 >= paddle_y && ball_y -2 <= paddle_y) {
     if (
       paddle_x > ball_x - 12 &&
       paddle_x < ball_x + 4
     ) {
-      ball_vel_y = -1;
+      ball_vel_y = -2;
     }
   // ball collision with cieling
   } else if (ball_y <= 0 + BALL_SIZE) {
-    ball_vel_y = 1;
+    ball_vel_y = 2;
   }
   // ball collision with floor
   if (ball_y >= SCREEN_HEIGHT + BALL_SIZE) {
-    lives--;
-    set_paddle();
-    set_ball(1);
-    set_lives();
-    game_started = 0;
+    state_life_end();
     if (lives <= 0) {
-      game_over = 1;
+      state_game_over();
     }
   }
   // ball collision with right wall
   if (ball_x >= SCREEN_WIDTH) {
-    ball_vel_x = -1;
+    ball_vel_x = -2;
   // ball collision with left wall
   } else if (ball_x <= 0 + (SPRITE_SIZE / 2)) {
-    ball_vel_x = 1;
+    ball_vel_x = 2;
   }
 }
-
-
-
 
 void move()
 {
@@ -378,8 +403,21 @@ void move()
   move_sprite(2, ball_x, ball_y);
 }
 
-void score()
-{
+void score() {
+  int i;
+  int blocks_remaining = 0;
+  for (i=0; i<24; i++) {
+    int block_i = block_sprites[i][0];
+    int block_x = block_sprites[i][1];
+    int block_y = block_sprites[i][2];
+
+    if (block_x + block_y != 0) {
+      blocks_remaining++;
+    }
+  }
+  if (blocks_remaining == 0) {
+    state_blocks_gone();
+  }
   if (game_over) {
     set_paddle();
     set_ball(1);
@@ -387,6 +425,41 @@ void score()
     game_started = 0;
     game_over = 0;
   }
+}
+
+void state_life_start() {
+  game_started = 1;
+  if (lives <= 0) {
+    lives = INITIAL_LIVES;
+    set_lives();
+  }
+}
+
+void state_blocks_gone() {
+  current_level++;
+  game_started = 0;
+  ball_vel_x = 0;
+  ball_vel_y = 0;
+  
+  set_paddle();
+  set_ball(1);
+  set_blocks();
+}
+
+void state_life_end() {
+  ball_vel_x = 0;
+  ball_vel_y = 0;
+  // lives--;
+  set_paddle();
+  set_ball(1);
+  set_lives();
+  game_started = 0;
+}
+
+void state_game_over() {
+  game_over = 1;
+  ball_vel_x = 0;
+  ball_vel_y = 0;
 }
 
 void run()
