@@ -255,6 +255,15 @@ void physics()
   }
 }
 
+int abs(int num)
+{
+  if (num < 0) {
+    return num * -1;
+  } else {
+    return num;
+  }
+}
+
 void collide()
 {
   int i;
@@ -265,6 +274,11 @@ void collide()
     int block_i = block_sprites[i][0];
     int block_x = block_sprites[i][1];
     int block_y = block_sprites[i][2];
+    int hit_top = 0;
+      int hit_bottom = 0;
+      int hit_left = 0;
+      int hit_right = 0;
+
     if (
       !collided &&
       block_x + block_y != 0 &&
@@ -286,22 +300,26 @@ void collide()
         block_sprites[i - 1][1] = 0;
         block_sprites[i - 1][2] = 0;
       }
-      
+
       if (ball_y < block_y) {
-        // hit from top
-        ball_vel_y = -1;
+        hit_top = 1;
+      } else if (ball_y > block_y) {
+        hit_bottom = 1;
       }
-      if (ball_y > block_y) {
-        // hit from bottom
-        ball_vel_y = 1;
+      if (ball_x < block_x) {
+        hit_left = 1;
+      } else if (ball_x > block_x) {
+        hit_right = 1;
       }
 
-      if (ball_x < block_x) {
-        // hit from left
-        ball_vel_x = -1;
+      if (hit_top) {
+        ball_vel_y = -1;
+      } else if (hit_bottom) {
+        ball_vel_y = 1;
       }
-      if (ball_x > block_x) {
-        // hit from right
+      if (hit_left) {
+        ball_vel_x = -1;
+      } else if (hit_right) {
         ball_vel_x = 1;
       }
     }
@@ -350,6 +368,7 @@ void collide()
 
 
 
+
 void move()
 {
   // paddle
@@ -363,7 +382,8 @@ void score()
 {
   if (game_over) {
     set_paddle();
-    set_ball(0);
+    set_ball(1);
+    set_blocks();
     game_started = 0;
     game_over = 0;
   }
