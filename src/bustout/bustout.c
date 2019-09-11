@@ -98,7 +98,7 @@ UBYTE ball_y;
 UBYTE ball_vel_x;
 UBYTE ball_vel_y;
 const int ball_sprite = 2;
-const int ball_speed = 2;
+const int ball_speed = 1;
 
 // array holding block sprite indexes, x, y coords
 // [[index, x_coord, y_coord]]
@@ -130,7 +130,7 @@ void set_ball(int move)
   // initial ball movement
   if (move) {
     ball_vel_y = -1;
-    ball_vel_x = -1;
+    ball_vel_x = 1;
   } else {
     ball_vel_x = 0;
     ball_vel_y = 0;
@@ -210,18 +210,23 @@ void set_blocks()
 void input()
 {
   // paddle movement
-  if(key & (J_LEFT|J_RIGHT)) {
+  if(key & (J_LEFT|J_RIGHT|J_UP|J_DOWN)) {
     if(key & J_LEFT && paddle_x > 0) {
       paddle_vel_x = -1 * paddle_speed;
     }
     if(key & J_RIGHT && paddle_x < SCREEN_WIDTH) {
       paddle_vel_x = 1 * paddle_speed;
     }
+    if(key & J_UP) {
+      paddle_vel_y = -1 * paddle_speed;
+    }
+    if(key & J_DOWN) {
+      paddle_vel_y = 1 * paddle_speed;
+    }
   }
 
   if(key & J_A) {
     game_started = 1;
-    set_ball(1);
     if (lives <= 0) {
       lives = INITIAL_LIVES;
       set_lives();
@@ -235,14 +240,72 @@ void physics()
   if(key & (J_LEFT|J_RIGHT)) {
     paddle_x+=paddle_vel_x;
   }
+  if(key & (J_UP|J_DOWN)) {
+    paddle_y+=paddle_vel_y;
+  }
   // ball
-  ball_x+=(ball_vel_x * ball_speed);
-  ball_y+=(ball_vel_y * ball_speed);
+  if (game_started) {
+    // ball only moves on it's own if the game is started
+    ball_x+=(ball_vel_x * ball_speed);
+    ball_y+=(ball_vel_y * ball_speed);
+  } else {
+    // ball moves with paddle when game is not started
+    ball_x = paddle_x + (BALL_SIZE / 2);
+    ball_y = paddle_y - (BALL_SIZE / 2);
+  }
 }
 
 void collide()
 {
   int i;
+  int collided = 0;
+
+  // ball collision with blocks
+  for (i=0; i<24; i++) {
+    int block_i = block_sprites[i][0];
+    int block_x = block_sprites[i][1];
+    int block_y = block_sprites[i][2];
+    if (
+      !collided &&
+      block_x + block_y != 0 &&
+      ball_x <= block_x + 8 && ball_x >= block_x - 8 &&
+      ball_y <= block_y + 8 && ball_y >= block_y - 16
+    ) {
+      collided = 1;
+      move_sprite(block_i, 0, 0);
+      block_sprites[i][1] = 0;
+      block_sprites[i][2] = 0;
+      if (i % 2 == 0) {
+        // even indexes are left side sprites, move the right buddy
+        move_sprite(block_i + 1, 0, 0);
+        block_sprites[i + 1][1] = 0;
+        block_sprites[i + 1][2] = 0;
+      } else {
+        // odd indexes are right side sprites, move the left buddy
+        move_sprite(block_i - 1, 0, 0);
+        block_sprites[i - 1][1] = 0;
+        block_sprites[i - 1][2] = 0;
+      }
+      
+      if (ball_y < block_y) {
+        // hit from top
+        ball_vel_y = -1;
+      }
+      if (ball_y > block_y) {
+        // hit from bottom
+        ball_vel_y = 1;
+      }
+
+      if (ball_x < block_x) {
+        // hit from left
+        ball_vel_x = -1;
+      }
+      if (ball_x > block_x) {
+        // hit from right
+        ball_vel_x = 1;
+      }
+    }
+  }
 
   // paddle collision with walls
   if (paddle_x >= SCREEN_WIDTH) {
@@ -283,19 +346,9 @@ void collide()
   } else if (ball_x <= 0 + (SPRITE_SIZE / 2)) {
     ball_vel_x = 1;
   }
-  // ball collision with blocks
-  for (i=0; i<24; i++) {
-    int block_i = block_sprites[i][0];
-    int block_x = block_sprites[i][1];
-    int block_y = block_sprites[i][2];
-    if (
-      ball_x <= block_x + 5 && ball_x >= block_x - 5 &&
-      ball_y <= block_y + 5 && ball_y >= block_y - 5
-    ) {
-      // move_sprite(block_i, 0, 0);
-    }
-  }
 }
+
+
 
 void move()
 {
@@ -324,12 +377,10 @@ void run()
     key = joypad();
 
     input();
-    if (game_started) {
-      physics();
-      collide();
-      move();
-      score();
-    }
+    physics();
+    collide();
+    move();
+    score();
 
     SHOW_SPRITES;
   }
