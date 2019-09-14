@@ -6,16 +6,19 @@ static void state_life_end();
 static void state_blocks_gone();
 static void state_game_over();
 
-const int block_map[2][3][4] = {
+// each map can only have up to 9 ones
+const int block_map[2][4][6] = {
   {
-    {1,0,1,0},
-    {0,1,0,1},
-    {1,0,1,0}
+    {0,1,0,0,1,0},
+    {0,0,0,0,0,0},
+    {1,0,0,0,0,1},
+    {0,1,1,1,1,0}
   },
   {
-    {1,1,1,1},
-    {1,0,0,1},
-    {1,1,1,1}
+    {1,0,0,0,0,1},
+    {0,1,0,0,1,0},
+    {0,1,0,0,1,0},
+    {1,0,0,0,0,1}
   }
 };
 
@@ -189,8 +192,8 @@ void set_lives()
 
 void set_blocks() {
   int i, j, a, b, a_x, b_x, a_y, b_y, offset_x, offset_y;
-  int width = 4;
-  int height = 3;
+  int width = 6;
+  int height = 4;
 
   int sp = lives_sprite_begin + (INITIAL_LIVES * 2 * 2);
   int init_sp = sp;
@@ -204,9 +207,9 @@ void set_blocks() {
         offset_y = j * 16;
         a = sp++;
         b = sp++;
-        a_x = 56 + offset_y;
+        a_x = 40 + offset_y;
         a_y = 48 + offset_x;
-        b_x = 56 + 8 + offset_y;
+        b_x = 40 + 8 + offset_y;
         b_y = 48 + offset_x;
 
         block_sprites[a - init_sp][0] = a;
