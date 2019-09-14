@@ -6,6 +6,19 @@ static void state_life_end();
 static void state_blocks_gone();
 static void state_game_over();
 
+const int block_map[2][3][4] = {
+  {
+    {1,0,1,0},
+    {0,1,0,1},
+    {1,0,1,0}
+  },
+  {
+    {1,1,1,1},
+    {1,0,0,1},
+    {1,1,1,1}
+  }
+};
+
 const unsigned char paddle_sprite_data[] = 
 { 
   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -176,48 +189,18 @@ void set_lives()
 
 void set_blocks() {
   int i, j, a, b, a_x, b_x, a_y, b_y, offset_x, offset_y;
+  int width = 4;
+  int height = 3;
 
   int sp = lives_sprite_begin + (INITIAL_LIVES * 2 * 2);
   int init_sp = sp;
 
   set_sprite_data(32, 8, block_sprite_data);
 
-  if (current_level == 0) {
-    int width = 4;
-    int height = 3;
-
-    for (i=0; i<height; i++) {
-      offset_x = i * 16;
-      for (j=0; j<width; j++) {
-        offset_y = j * 16;
-        a = sp++;
-        b = sp++;
-        a_x = 56 + offset_y;
-        a_y = 48 + offset_x;
-        b_x = 56 + 8 + offset_y;
-        b_y = 48 + offset_x;
-
-        block_sprites[a - init_sp][0] = a;
-        block_sprites[a - init_sp][1] = a_x;
-        block_sprites[a - init_sp][2] = a_y;
-
-        block_sprites[b - init_sp][0] = b;
-        block_sprites[b - init_sp][1] = b_x;
-        block_sprites[b - init_sp][2] = b_y;
-
-        set_sprite_tile(a, 32);
-        set_sprite_tile(b, 34);
-        move_sprite(a, a_x, a_y);
-        move_sprite(b, b_x, b_y);
-      }
-    }
-  } else if (current_level == 1) {
-    int width = 3;
-    int height = 4;
-
-    for (i=0; i<height; i++) {
-      offset_x = i * 16;
-      for (j=0; j<width; j++) {
+  for (i=0; i<height; i++) {
+    offset_x = i * 16;
+    for (j=0; j<width; j++) {
+      if (block_map[current_level][i][j]) {
         offset_y = j * 16;
         a = sp++;
         b = sp++;
@@ -241,7 +224,6 @@ void set_blocks() {
       }
     }
   }
-  
 }
 
 void input()
