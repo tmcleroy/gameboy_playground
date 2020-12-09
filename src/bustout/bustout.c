@@ -354,12 +354,12 @@ void collide()
   // ball collision with paddle
   if (ball_y + 2 >= paddle_y && ball_y -2 <= paddle_y) {
     if (
-      paddle_x > ball_x - 12 &&
-      paddle_x < ball_x + 4
+      paddle_x > ball_x - 18 &&
+      paddle_x < ball_x + 10
     ) {
       ball_vel_y = -1;
     }
-  // ball collision with cieling
+  // ball collision with ceiling
   } else if (ball_y <= 0 + BALL_SIZE) {
     ball_vel_y = 1;
   }
@@ -422,6 +422,9 @@ void state_life_start() {
 
 void state_blocks_gone() {
   current_level++;
+  if (current_level + 1 > 3) {
+    current_level = 0;
+  }
   game_started = 0;
   ball_vel_x = 0;
   ball_vel_y = 0;
