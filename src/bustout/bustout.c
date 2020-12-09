@@ -130,6 +130,13 @@ const int ball_sprite = 2;
 const int ball_speed = 2;
 // whether or not you can move the paddle up and down
 int vertical_paddle_movement = 1;
+// score
+int game_score = 0;
+// frames elapsed, reset every 60 frames
+int frames = 0;
+// seconds elapsed
+int seconds = 0;
+int temp_seconds = 0;
 
 // array holding block sprite indexes, x, y coords
 // [[index, x_coord, y_coord]]
@@ -293,17 +300,22 @@ void collide()
     int block_x = block_sprites[i][1];
     int block_y = block_sprites[i][2];
     int hit_top = 0;
-      int hit_bottom = 0;
-      int hit_left = 0;
-      int hit_right = 0;
+    int hit_bottom = 0;
+    int hit_left = 0;
+    int hit_right = 0;
 
     if (
       !collided &&
+      // n seconds have elapsed since last collision
+      // (temp_seconds == 0 || seconds - temp_seconds > 1) &&
       block_x + block_y != 0 &&
       ball_x <= block_x + 8 && ball_x >= block_x - 8 &&
       ball_y <= block_y + 8 && ball_y >= block_y - 16
     ) {
       collided = 1;
+      game_score += 80;
+      // temp_seconds = seconds;
+
       move_sprite(block_i, 0, 0);
       block_sprites[i][1] = 0;
       block_sprites[i][2] = 0;
@@ -323,8 +335,7 @@ void collide()
         hit_top = 1;
       } else if (ball_y > block_y) {
         hit_bottom = 1;
-      }
-      if (ball_x < block_x) {
+      } else if (ball_x < block_x) {
         hit_left = 1;
       } else if (ball_x > block_x) {
         hit_right = 1;
@@ -334,8 +345,7 @@ void collide()
         ball_vel_y = -1;
       } else if (hit_bottom) {
         ball_vel_y = 1;
-      }
-      if (hit_left) {
+      } else if (hit_left) {
         ball_vel_x = -1;
       } else if (hit_right) {
         ball_vel_x = 1;
@@ -454,6 +464,12 @@ void run()
 {
   // game loop
   while(1) {
+    frames++;
+    if (frames == 60) {
+      frames = 0;
+      seconds++;
+    }
+
     wait_vbl_done();
 
     key = joypad();
