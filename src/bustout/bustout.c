@@ -102,7 +102,6 @@ const unsigned char block_sprite_data[] =
   0xFF,0x05,0xFF,0xFD,0xFF,0x01,0xFF,0xFF
 };
 
-
 int SCREEN_WIDTH = 160;
 int SCREEN_HEIGHT = 144;
 int SPRITE_SIZE = 16;
@@ -129,6 +128,8 @@ UBYTE ball_vel_x;
 UBYTE ball_vel_y;
 const int ball_sprite = 2;
 const int ball_speed = 2;
+// whether or not you can move the paddle up and down
+int vertical_paddle_movement = 1;
 
 // array holding block sprite indexes, x, y coords
 // [[index, x_coord, y_coord]]
@@ -266,7 +267,7 @@ void physics()
   if(key & (J_LEFT|J_RIGHT)) {
     paddle_x+=paddle_vel_x;
   }
-  if(key & (J_UP|J_DOWN)) {
+  if(vertical_paddle_movement && key & (J_UP|J_DOWN)) {
     paddle_y+=paddle_vel_y;
   }
   // ball
