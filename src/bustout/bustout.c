@@ -3,6 +3,7 @@
 #include "alpha.c"
 #include "blank_screen.c"
 #include "sprites.c"
+#include "codysad.c"
 
 int abs(int num)
 {
@@ -44,12 +45,13 @@ int SCREEN_WIDTH = 160;
 int SCREEN_HEIGHT = 144;
 int SPRITE_SIZE = 16;
 int BALL_SIZE = 8;
-const int INITIAL_LIVES = 5;
+const int INITIAL_LIVES = 3;
 const int framerate = 60;
 
 UBYTE key;
 int lives = INITIAL_LIVES;
 int game_started = 0;
+int splash_over = 0;
 int game_over = 0;
 int current_level = 0;
 
@@ -84,13 +86,36 @@ int block_sprites[24][3];
 const int lives_sprite_begin = 3;
 
 unsigned char score_array[] = { 0x30, 0x30, 0x30, 0x30 };
+unsigned char game_over_message_array[] = {
+  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0x17, 0x11, 0x1D, 0x15, 0xff, 0x1F, 0x26, 0x15, 0x22, 0xff, 0xff,
+  0xff, 0xff, 0x1E, 0x1F, 0xff, 0x1D, 0x25, 0x1C, 0x1C, 0x15, 0x24, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+};
 
-void set_background()
+void render_background()
 {
   // load alphanumeric background tiles
   set_bkg_data(0, 47, alpha);
   // blank the entire screen
   set_bkg_tiles(0, 0, 20, 18, blank_screen);
+}
+
+void render_sad_cody()
+{
+  set_bkg_data(0, 209, codysad_tiledata);
+  set_bkg_tiles(4, 0, 13, 16, codysad_tilemap);
+
+  // load alphanumeric background tiles
+  set_bkg_data(0, 47, alpha);
+
+  set_bkg_tiles(
+    4, // xrow
+    0, // yrow
+    13, // num tiles width (columns)
+    4, // num tiles height (rows)
+    game_over_message_array
+  );
 }
 
 void set_paddle()
@@ -194,6 +219,14 @@ void set_blocks() {
   }
 }
 
+void end_splash() {
+  set_paddle();
+  set_ball(1);
+  set_lives();
+  set_blocks();
+  splash_over = 1;
+}
+
 void input()
 {
   // paddle movement
@@ -214,6 +247,10 @@ void input()
 
   if(key & J_A) {
     state_life_start();
+  }
+
+  if(key & J_START) {
+    end_splash();
   }
 }
 
@@ -423,9 +460,13 @@ void state_life_end() {
 }
 
 void state_game_over() {
+  int i;
   game_over = 1;
   ball_vel_x = 0;
   ball_vel_y = 0;
+
+  render_background();
+  render_sad_cody();
 }
 
 void run()
@@ -444,11 +485,13 @@ void run()
     key = joypad();
 
     input();
-    physics();
-    collide();
-    move();
-    score();
-    render_score();
+    if (splash_over) {
+      physics();
+      collide();
+      move();
+      score();
+      render_score();
+    }
 
     SHOW_BKG;
     SHOW_SPRITES;
@@ -459,11 +502,10 @@ void main()
 {
   SPRITES_8x16;
 
-  set_background();
-  set_paddle();
-  set_ball(1);
-  set_lives();
-  set_blocks();
+  render_background();
+  // render_sad_cody();
+  // SHOW_BKG;
+  // end_splash();
   // run game loop
   run();
 }
