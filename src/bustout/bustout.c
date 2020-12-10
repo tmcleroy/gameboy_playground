@@ -4,6 +4,7 @@
 #include "blank_screen.c"
 #include "sprites.c"
 #include "codysad.c"
+#include "codysplash.c"
 
 int abs(int num)
 {
@@ -118,6 +119,15 @@ void render_sad_cody()
   );
 }
 
+void render_splash()
+{
+  set_bkg_data(0, 1, codysplash_tiledata);
+  set_bkg_tiles(0, 0, 20, 18, blank_screen);
+  
+  set_bkg_data(0, 256, codysplash_tiledata);
+  set_bkg_tiles(0, 3, 20, 13, codysplash_tilemap);
+}
+
 void set_paddle()
 {
   paddle_x = SCREEN_WIDTH / 2;
@@ -224,6 +234,7 @@ void end_splash() {
   set_ball(1);
   set_lives();
   set_blocks();
+  render_background();
   splash_over = 1;
 }
 
@@ -502,7 +513,8 @@ void main()
 {
   SPRITES_8x16;
 
-  render_background();
+  // render_background();
+  render_splash();
   // render_sad_cody();
   // SHOW_BKG;
   // end_splash();
