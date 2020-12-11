@@ -72,7 +72,7 @@ UBYTE ball_vel_y;
 const int ball_sprite = 2;
 const int ball_speed = 2;
 // whether or not you can move the paddle up and down
-int vertical_paddle_movement = 1;
+int vertical_paddle_movement = 0;
 // score
 int game_score = 0;
 // frames elapsed, reset every 60 frames
@@ -114,13 +114,13 @@ void render_background()
 void render_sad_cody()
 {
   set_bkg_data(0, 209, codysad_tiledata);
-  set_bkg_tiles(4, 0, 13, 16, codysad_tilemap);
+  set_bkg_tiles(1, 0, 13, 16, codysad_tilemap);
 
   // load alphanumeric background tiles
   set_bkg_data(0, 47, alpha);
 
   set_bkg_tiles(
-    4, // xrow
+    1, // xrow
     0, // yrow
     13, // num tiles width (columns)
     4, // num tiles height (rows)
@@ -131,13 +131,13 @@ void render_sad_cody()
 void render_happy_cody()
 {
   set_bkg_data(0, 235, codyhappy_tiledata);
-  set_bkg_tiles(4, 0, 13, 18, codyhappy_tilemap);
+  set_bkg_tiles(1, 0, 13, 18, codyhappy_tilemap);
 
   // load alphanumeric background tiles
   set_bkg_data(0, 47, alpha);
 
   set_bkg_tiles(
-    4, // xrow
+    1, // xrow
     0, // yrow
     13, // num tiles width (columns)
     4, // num tiles height (rows)
@@ -152,6 +152,7 @@ void render_splash()
   
   set_bkg_data(0, 256, codysplash_tiledata);
   set_bkg_tiles(0, 3, 20, 13, codysplash_tilemap);
+  HIDE_SPRITES;
 }
 
 void set_paddle()
@@ -287,8 +288,22 @@ void input()
   }
 
   if(key & J_START) {
-    end_splash();
+    if (game_over) { // continuing from a game over
+      restart_game();
+    } else { // at splash screen
+      end_splash();
+    }
   }
+}
+
+void restart_game(){
+  game_score = 0;
+  game_started = 0;
+  game_over = 0;
+  splash_over = 0;
+  current_level = 0;
+  lives = INITIAL_LIVES;
+  render_splash();
 }
 
 void physics()
@@ -433,15 +448,8 @@ void score() {
       blocks_remaining++;
     }
   }
-  if (blocks_remaining == 0) {
+  if (blocks_remaining == 0 && !game_over) {
     state_blocks_gone();
-  }
-  if (game_over) {
-    set_paddle();
-    set_ball(1);
-    set_blocks();
-    game_started = 0;
-    game_over = 0;
   }
 }
 
@@ -497,25 +505,16 @@ void state_life_end() {
 }
 
 void state_game_over() {
-  int i;
   game_over = 1;
   ball_vel_x = 0;
   ball_vel_y = 0;
 
-  render_background();
   if (game_score < 2000) {
     render_sad_cody();
   } else {
     render_happy_cody();
   }
-
-  for (i=0; i<24; i++) {
-    int block_i = block_sprites[i][0];
-    int block_x = block_sprites[i][1];
-
-    move_sprite(block_i + 1, 0, 0);
-    move_sprite(block_i - 1, 0, 0);
-  }
+  HIDE_SPRITES;
 }
 
 void run()
@@ -534,7 +533,7 @@ void run()
     key = joypad();
 
     input();
-    if (splash_over) {
+    if (splash_over && !game_over) {
       physics();
       collide();
       move();
@@ -543,7 +542,11 @@ void run()
     }
 
     SHOW_BKG;
-    SHOW_SPRITES;
+    if (game_over) {
+      HIDE_SPRITES;
+    } else {
+      SHOW_SPRITES;
+    }
   }
 }
 
@@ -551,11 +554,7 @@ void main()
 {
   SPRITES_8x16;
 
-  // render_background();
   render_splash();
-  // render_sad_cody();
-  // SHOW_BKG;
-  // end_splash();
   // run game loop
   run();
 }
