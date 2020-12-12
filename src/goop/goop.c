@@ -6,49 +6,34 @@
 
 static void state_game_over();
 
+// game config
 int SCREEN_WIDTH = 160;
 int SCREEN_HEIGHT = 144;
 int SPRITE_SIZE = 16;
+const int FRAME_RATE = 60;
 const int INITIAL_LIVES = 3;
-const int framerate = 60;
 
 // currently pressed key
 UBYTE key;
+
+// game state
 int lives = INITIAL_LIVES;
 int game_started = 0;
 int game_over = 0;
 int current_level = 0;
-
-UBYTE paddle_x;
-UBYTE paddle_y;
-UBYTE paddle_vel_x;
-UBYTE paddle_vel_y;
-const int paddle_sprite_left = 0;
-const int paddle_sprite_right = 1;
-const int paddle_speed = 3;
-
-// whether or not you can move the paddle up and down
-int vertical_paddle_movement = 1;
-// score
 int game_score = 0;
 // frames elapsed, reset every 60 frames
 int frames = 0;
-// seconds elapsed
+// seconds elapsed, never reset
 int seconds = 0;
 
+UBYTE paddle_coords[] = {0, 0};
+UBYTE paddle_vel[] = {0, 0};
+const int paddle_sprites[] = {0, 1};
+const int paddle_speed = 3;
 
-const int lives_sprite_begin = 3;
 
 unsigned char score_array[] = { 0x30, 0x30, 0x30, 0x30 };
-
-void restart_game(){
-  game_score = 0;
-  game_started = 0;
-  game_over = 0;
-  current_level = 0;
-  lives = INITIAL_LIVES;
-}
-
 
 void render_background()
 {
@@ -60,38 +45,35 @@ void render_background()
 
 void set_paddle()
 {
-  paddle_x = SCREEN_WIDTH / 2;
-  paddle_y = SCREEN_HEIGHT - 1;
+  paddle_coords[0] = SCREEN_WIDTH / 2;
+  paddle_coords[1] = SCREEN_HEIGHT - 1;
 
   set_sprite_data(0, 8, paddle_sprite_data);
-  set_sprite_tile(paddle_sprite_left, 0);
-  set_sprite_tile(paddle_sprite_right, 2);
-  move_sprite(paddle_sprite_left, paddle_x, paddle_y);
-  move_sprite(paddle_sprite_right, paddle_x + 8, paddle_y);
+  set_sprite_tile(paddle_sprites[0], 0);
+  set_sprite_tile(paddle_sprites[1], 2);
+  move_sprite(paddle_sprites[0], paddle_coords[0], paddle_coords[1]);
+  move_sprite(paddle_sprites[1], paddle_coords[0] + (SPRITE_SIZE/2), paddle_coords[1]);
 }
 
 void input()
 {
   // paddle movement
   if(key & (J_LEFT|J_RIGHT|J_UP|J_DOWN)) {
-    if(key & J_LEFT && paddle_x > 0) {
-      paddle_vel_x = -1 * paddle_speed;
+    if(key & J_LEFT && paddle_coords[0] > 0) {
+      paddle_vel[0] = -1 * paddle_speed;
     }
-    if(key & J_RIGHT && paddle_x < SCREEN_WIDTH) {
-      paddle_vel_x = 1 * paddle_speed;
+    if(key & J_RIGHT && paddle_coords[0] < SCREEN_WIDTH) {
+      paddle_vel[0] = 1 * paddle_speed;
     }
     if(key & J_UP) {
-      paddle_vel_y = -1 * paddle_speed;
+      paddle_vel[1] = -1 * paddle_speed;
     }
     if(key & J_DOWN) {
-      paddle_vel_y = 1 * paddle_speed;
+      paddle_vel[1] = 1 * paddle_speed;
     }
   }
 
   if(key & J_A) {
-  }
-
-  if(key & J_START) {
   }
 }
 
@@ -99,10 +81,10 @@ void physics()
 {
   // paddle
   if(key & (J_LEFT|J_RIGHT)) {
-    paddle_x+=paddle_vel_x;
+    paddle_coords[0]+=paddle_vel[0];
   }
-  if(vertical_paddle_movement && key & (J_UP|J_DOWN)) {
-    paddle_y+=paddle_vel_y;
+  if(key & (J_UP|J_DOWN)) {
+    paddle_coords[1]+=paddle_vel[1];
   }
 }
 
@@ -111,16 +93,16 @@ void collide() {
 
 void move() {
   // paddle
-  move_sprite(0, paddle_x, paddle_y);
-  move_sprite(1, paddle_x + 8, paddle_y);
+  move_sprite(0, paddle_coords[0], paddle_coords[1]);
+  move_sprite(1, paddle_coords[0] + 8, paddle_coords[1]);
 }
 
 void score() {
 }
 
 void render_score() {
+    if (frames % (FRAME_RATE / 2) == 0) {
   // only render score every half second
-  if (frames % (framerate / 2) == 0) {
     score_array[0] = numbers[(game_score / 1000) % 10]; // thousands
     score_array[1] = numbers[(game_score / 100) % 10]; // hundreds
     score_array[2] = numbers[(game_score / 10) % 10]; // tens
@@ -137,6 +119,10 @@ void render_score() {
   );
 }
 
+//
+// GAME STATE
+//
+
 void state_game_over() {
   game_over = 1;
   HIDE_SPRITES;
@@ -148,13 +134,25 @@ void state_game_init() {
   SHOW_SPRITES;
 }
 
+void state_game_restart(){
+  game_score = 0;
+  game_started = 0;
+  game_over = 0;
+  current_level = 0;
+  lives = INITIAL_LIVES;
+}
+
+//
+// GAME LOOP
+//
+
 void run()
 {
   // game loop
   while(1) {
 
+    if (frames == FRAME_RATE) {
     frames++;
-    if (frames == framerate) {
       frames = 0;
       seconds++;
     }
