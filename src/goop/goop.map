@@ -1,0 +1,299 @@
+AREA .  .ABS.
+	RADIX HEX
+	BASE 0000
+	SIZE 0000
+	ATTRIB ABS OVR
+	GLOBALS
+		l__HEAP	0000
+		l__BSEG	0000
+		l_.  .ABS.	0000
+		l__GSFINAL	0000
+		l__ISEG	0000
+		s_.  .ABS.	0000
+		s__HEADER	0000
+		l__XSEG	0000
+		.init	0000
+		l__OVERLAY	0000
+		l__LIT	0000
+		l__GSINITTAIL	0001
+		l__DATA	001F
+		l__BSS	005C
+		l__GSINIT	0066
+		l__BASE	01A3
+		l__HOME	01D3
+		l__HEADER	01E1
+		s__CODE	0200
+		l__CODE	09EF
+		s__HOME	0BEF
+		s__BASE	0DC2
+		s__LIT	0F65
+		s__GSINIT	0F65
+		s__GSINITTAIL	0FCB
+		s__GSFINAL	0FCC
+		.OAM	C000
+		s__DATA	C0A0
+		s__BSS	C0BF
+		s__HEAP	C11B
+		s__BSEG	C11B
+		s__ISEG	C11B
+		s__XSEG	C11B
+		s__OVERLAY	C11B
+		.STACK	E000
+		.refresh_OAM	FF80
+AREA _CODE
+	RADIX HEX
+	BASE 0200
+	SIZE 09EF
+	ATTRIB REL CON
+	GLOBALS
+		_restart_game	0200
+		_alpha	022B
+		_blank_screen	052B
+		_numbers	0693
+		_paddle_sprite_data	069D
+		_INITIAL_LIVES	06DD
+		_framerate	06DF
+		_paddle_sprite_left	06E1
+		_paddle_sprite_right	06E3
+		_paddle_speed	06E5
+		_lives_sprite_begin	06E7
+		_render_background	06E9
+		_set_paddle	0708
+		_input	0794
+		_physics	0862
+		_collide	0899
+		_move	089A
+		_score	08C9
+		_render_score	08CA
+		_state_game_init	09FF
+		_run	0A25
+		_main	0ACC
+		__divschar_rrx_s	0AED
+		__divschar_rrx_hds	0AF4
+		__modschar_rrx_s	0AFB
+		__modschar_rrx_hds	0B02
+		__divsint_rrx_s	0B07
+		__divsint_rrx_hds	0B13
+		__modsint_rrx_s	0B1B
+		__modsint_rrx_hds	0B27
+		__divuchar_rrx_s	0B2D
+		__divuchar_rrx_hds	0B34
+		__moduchar_rrx_s	0B3B
+		__moduchar_rrx_hds	0B42
+		__divuint_rrx_s	0B47
+		__divuint_rrx_hds	0B53
+		__moduint_rrx_s	0B5B
+		__moduint_rrx_hds	0B67
+		.mod8	0B6D
+		.div8	0B6D
+		.mod16	0B75
+		.div16	0B75
+		.modu8	0BAF
+		.divu8	0BAF
+		.modu16	0BB2
+		.divu16	0BB2
+AREA _HEADER
+	RADIX HEX
+	BASE 0000
+	SIZE 01E1
+	ATTRIB ABS OVR
+	GLOBALS
+		_exit	01D2
+AREA _HOME
+	RADIX HEX
+	BASE 0BEF
+	SIZE 01D3
+	ATTRIB REL CON
+	GLOBALS
+		.set_mode	0BEF
+		.remove_VBL	0BFF
+		.remove_LCD	0C05
+		.remove_TIM	0C0B
+		.remove_SIO	0C11
+		.remove_JOY	0C17
+		.add_VBL	0C1D
+		.add_LCD	0C23
+		.add_TIM	0C29
+		.add_SIO	0C2F
+		.add_JOY	0C35
+		.remove_int	0C3B
+		.add_int	0C5B
+		.wait_vbl_done	0C77
+		_wait_vbl_done	0C77
+		_display_off	0C8E
+		.display_off	0C8E
+		.serial_IO	0CAF
+		_mode	0CDE
+		_get_mode	0CE7
+		_enable_interrupts	0CEC
+		_disable_interrupts	0CEE
+		_reset	0CF0
+		.reset	0CF0
+		_set_interrupts	0CF6
+		_remove_VBL	0D01
+		_remove_LCD	0D0C
+		_remove_TIM	0D17
+		_remove_SIO	0D22
+		_remove_JOY	0D2D
+		_add_VBL	0D38
+		_add_LCD	0D43
+		_add_TIM	0D4E
+		_add_SIO	0D59
+		_add_JOY	0D64
+		_clock	0D6F
+		__printTStates	0D78
+		banked_call	0D79
+		banked_ret	0D92
+		__initrleblock	0D9B
+AREA _BASE
+	RADIX HEX
+	BASE 0DC2
+	SIZE 01A3
+	ATTRIB REL CON
+	GLOBALS
+		.mv_sprite	0DC2
+		_move_sprite	0DD1
+		_set_win_data	0DDE
+		_set_bkg_data	0DDE
+		_set_sprite_data	0E2B
+		.padup	0E5A
+		_waitpadup	0E5A
+		.jpad	0E6A
+		.wait_pad	0E97
+		_joypad	0E9E
+		_waitpad	0EA3
+		.set_sprite_tile	0EAD
+		_set_sprite_tile	0EBA
+		.copy_vram	0EC5
+		_get_data	0ED4
+		_set_data	0ED4
+		_set_bkg_tiles	0EE7
+		.set_xy_wtt	0EFB
+		.set_xy_btt	0F0C
+		.set_xy_tt	0F1B
+		_set_tiles	0F4C
+AREA _LIT
+	RADIX HEX
+	BASE 0F65
+	SIZE 0000
+	ATTRIB REL CON
+AREA _GSINIT
+	RADIX HEX
+	BASE 0F65
+	SIZE 0066
+	ATTRIB REL CON
+	GLOBALS
+		gsinit	0F65
+AREA _GSINITTAIL
+	RADIX HEX
+	BASE 0FCB
+	SIZE 0001
+	ATTRIB REL CON
+AREA _GSFINAL
+	RADIX HEX
+	BASE 0FCC
+	SIZE 0000
+	ATTRIB REL CON
+AREA _DATA
+	RADIX HEX
+	BASE C0A0
+	SIZE 001F
+	ATTRIB REL CON
+	GLOBALS
+		_SCREEN_WIDTH	C0A0
+		_SCREEN_HEIGHT	C0A2
+		_SPRITE_SIZE	C0A4
+		_key	C0A6
+		_lives	C0A7
+		_game_started	C0A9
+		_game_over	C0AB
+		_current_level	C0AD
+		_paddle_x	C0AF
+		_paddle_y	C0B0
+		_paddle_vel_x	C0B1
+		_paddle_vel_y	C0B2
+		_vertical_paddle_movement	C0B3
+		_game_score	C0B5
+		_frames	C0B7
+		_seconds	C0B9
+		_score_array	C0BB
+AREA _BSS
+	RADIX HEX
+	BASE C0BF
+	SIZE 005C
+	ATTRIB REL CON
+	GLOBALS
+		__cpu	C0BF
+		.mode	C0C0
+		__io_out	C0C1
+		__io_in	C0C2
+		__io_status	C0C3
+		.vbl_done	C0C4
+		__current_bank	C0C5
+		_sys_time	C0C6
+		.sys_time	C0C6
+		.int_0x40	C0C8
+		.int_0x48	C0D8
+		.int_0x50	C0E8
+		.int_0x58	C0F8
+		.int_0x60	C108
+AREA _HEAP
+	RADIX HEX
+	BASE C11B
+	SIZE 0000
+	ATTRIB REL CON
+	GLOBALS
+		_malloc_heap_start	C11B
+AREA _OVERLAY
+	RADIX HEX
+	BASE C11B
+	SIZE 0000
+	ATTRIB REL CON
+AREA _ISEG
+	RADIX HEX
+	BASE C11B
+	SIZE 0000
+	ATTRIB REL CON
+AREA _BSEG
+	RADIX HEX
+	BASE C11B
+	SIZE 0000
+	ATTRIB REL CON
+AREA _XSEG
+	RADIX HEX
+	BASE C11B
+	SIZE 0000
+	ATTRIB REL CON
+MODULES
+	FILE /opt/gbdk/lib/small/asxxxx/gb/crt0.o
+		NAME Runtime
+	FILE goop.o
+		NAME lcc61720
+LIBRARIES
+	LIBRARY /opt/gbdk/lib/small/asxxxx/gbz80/gbz80.lib
+		MODULE crt0_rle.o
+	LIBRARY /opt/gbdk/lib/small/asxxxx/gbz80/gbz80.lib
+		MODULE div.o
+	LIBRARY /opt/gbdk/lib/small/asxxxx/gb/gb.lib
+		MODULE mv_spr.o
+	LIBRARY /opt/gbdk/lib/small/asxxxx/gb/gb.lib
+		MODULE set_data.o
+	LIBRARY /opt/gbdk/lib/small/asxxxx/gb/gb.lib
+		MODULE pad.o
+	LIBRARY /opt/gbdk/lib/small/asxxxx/gb/gb.lib
+		MODULE set_spr.o
+	LIBRARY /opt/gbdk/lib/small/asxxxx/gb/gb.lib
+		MODULE cpy_data.o
+	LIBRARY /opt/gbdk/lib/small/asxxxx/gb/gb.lib
+		MODULE set_bk_t.o
+	LIBRARY /opt/gbdk/lib/small/asxxxx/gb/gb.lib
+		MODULE set_xy_t.o
+USERBASEDEF
+	_CODE=0x0200
+	_DATA=0xC0A0
+	_CODE_1=0x4000
+USERGLOBALDEF
+	.OAM=0xC000
+	.STACK=0xE000
+	.refresh_OAM=0xFF80
+	.init=0x0000

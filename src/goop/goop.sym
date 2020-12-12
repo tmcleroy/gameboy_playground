@@ -1,0 +1,178 @@
+; no$gmb format .sym file
+; Generated automagically by ASxxxx linker V01.75 (SDK 3.0.0)
+; Area: .  .ABS.
+00:0000 s__HEADER
+00:0000 .init
+00:0200 s__CODE
+00:0BEF s__HOME
+00:0DC2 s__BASE
+00:0F65 s__LIT
+00:0F65 s__GSINIT
+00:0FCB s__GSINITTAIL
+00:0FCC s__GSFINAL
+00:C000 .OAM
+00:C0A0 s__DATA
+00:C0BF s__BSS
+00:C11B s__HEAP
+00:C11B s__BSEG
+00:C11B s__ISEG
+00:C11B s__XSEG
+00:C11B s__OVERLAY
+00:E000 .STACK
+00:FF80 .refresh_OAM
+; Area: _CODE
+00:0200 _restart_game
+00:022B _alpha
+00:052B _blank_screen
+00:0693 _numbers
+00:069D _paddle_sprite_data
+00:06DD _INITIAL_LIVES
+00:06DF _framerate
+00:06E1 _paddle_sprite_left
+00:06E3 _paddle_sprite_right
+00:06E5 _paddle_speed
+00:06E7 _lives_sprite_begin
+00:06E9 _render_background
+00:0708 _set_paddle
+00:0794 _input
+00:0862 _physics
+00:0899 _collide
+00:089A _move
+00:08C9 _score
+00:08CA _render_score
+00:09FF _state_game_init
+00:0A25 _run
+00:0ACC _main
+00:0AED __divschar_rrx_s
+00:0AF4 __divschar_rrx_hds
+00:0AFB __modschar_rrx_s
+00:0B02 __modschar_rrx_hds
+00:0B07 __divsint_rrx_s
+00:0B13 __divsint_rrx_hds
+00:0B1B __modsint_rrx_s
+00:0B27 __modsint_rrx_hds
+00:0B2D __divuchar_rrx_s
+00:0B34 __divuchar_rrx_hds
+00:0B3B __moduchar_rrx_s
+00:0B42 __moduchar_rrx_hds
+00:0B47 __divuint_rrx_s
+00:0B53 __divuint_rrx_hds
+00:0B5B __moduint_rrx_s
+00:0B67 __moduint_rrx_hds
+00:0B6D .mod8
+00:0B6D .div8
+00:0B75 .mod16
+00:0B75 .div16
+00:0BAF .modu8
+00:0BAF .divu8
+00:0BB2 .modu16
+00:0BB2 .divu16
+; Area: _HEADER
+00:01D2 _exit
+; Area: _HOME
+00:0BEF .set_mode
+00:0BFF .remove_VBL
+00:0C05 .remove_LCD
+00:0C0B .remove_TIM
+00:0C11 .remove_SIO
+00:0C17 .remove_JOY
+00:0C1D .add_VBL
+00:0C23 .add_LCD
+00:0C29 .add_TIM
+00:0C2F .add_SIO
+00:0C35 .add_JOY
+00:0C3B .remove_int
+00:0C5B .add_int
+00:0C77 .wait_vbl_done
+00:0C77 _wait_vbl_done
+00:0C8E _display_off
+00:0C8E .display_off
+00:0CAF .serial_IO
+00:0CDE _mode
+00:0CE7 _get_mode
+00:0CEC _enable_interrupts
+00:0CEE _disable_interrupts
+00:0CF0 _reset
+00:0CF0 .reset
+00:0CF6 _set_interrupts
+00:0D01 _remove_VBL
+00:0D0C _remove_LCD
+00:0D17 _remove_TIM
+00:0D22 _remove_SIO
+00:0D2D _remove_JOY
+00:0D38 _add_VBL
+00:0D43 _add_LCD
+00:0D4E _add_TIM
+00:0D59 _add_SIO
+00:0D64 _add_JOY
+00:0D6F _clock
+00:0D78 __printTStates
+00:0D79 banked_call
+00:0D92 banked_ret
+00:0D9B __initrleblock
+; Area: _BASE
+00:0DC2 .mv_sprite
+00:0DD1 _move_sprite
+00:0DDE _set_win_data
+00:0DDE _set_bkg_data
+00:0E2B _set_sprite_data
+00:0E5A .padup
+00:0E5A _waitpadup
+00:0E6A .jpad
+00:0E97 .wait_pad
+00:0E9E _joypad
+00:0EA3 _waitpad
+00:0EAD .set_sprite_tile
+00:0EBA _set_sprite_tile
+00:0EC5 .copy_vram
+00:0ED4 _get_data
+00:0ED4 _set_data
+00:0EE7 _set_bkg_tiles
+00:0EFB .set_xy_wtt
+00:0F0C .set_xy_btt
+00:0F1B .set_xy_tt
+00:0F4C _set_tiles
+; Area: _LIT
+; Area: _GSINIT
+00:0F65 gsinit
+; Area: _GSINITTAIL
+; Area: _GSFINAL
+; Area: _DATA
+00:C0A0 _SCREEN_WIDTH
+00:C0A2 _SCREEN_HEIGHT
+00:C0A4 _SPRITE_SIZE
+00:C0A6 _key
+00:C0A7 _lives
+00:C0A9 _game_started
+00:C0AB _game_over
+00:C0AD _current_level
+00:C0AF _paddle_x
+00:C0B0 _paddle_y
+00:C0B1 _paddle_vel_x
+00:C0B2 _paddle_vel_y
+00:C0B3 _vertical_paddle_movement
+00:C0B5 _game_score
+00:C0B7 _frames
+00:C0B9 _seconds
+00:C0BB _score_array
+; Area: _BSS
+00:C0BF __cpu
+00:C0C0 .mode
+00:C0C1 __io_out
+00:C0C2 __io_in
+00:C0C3 __io_status
+00:C0C4 .vbl_done
+00:C0C5 __current_bank
+00:C0C6 _sys_time
+00:C0C6 .sys_time
+00:C0C8 .int_0x40
+00:C0D8 .int_0x48
+00:C0E8 .int_0x50
+00:C0F8 .int_0x58
+00:C108 .int_0x60
+; Area: _HEAP
+00:C11B _malloc_heap_start
+; Area: _OVERLAY
+; Area: _ISEG
+; Area: _BSEG
+; Area: _XSEG
