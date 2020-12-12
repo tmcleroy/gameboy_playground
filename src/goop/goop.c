@@ -7,29 +7,35 @@
 static void state_game_over();
 
 // game config
-int SCREEN_WIDTH = 160;
-int SCREEN_HEIGHT = 144;
-int SPRITE_SIZE = 16;
-const int FRAME_RATE = 60;
-const int INITIAL_LIVES = 3;
+unsigned int SCREEN_WIDTH = 160;
+unsigned int SCREEN_HEIGHT = 144;
+unsigned int SPRITE_SIZE = 16;
+const unsigned int FRAME_RATE = 60;
+const unsigned int INITIAL_LIVES = 3;
 
 // currently pressed key
 UBYTE key;
 
 // game state
-int lives = INITIAL_LIVES;
-int game_started = 0;
-int game_over = 0;
+unsigned int lives = INITIAL_LIVES;
+unsigned int game_started = 0;
+unsigned int game_over = 0;
 // frames elapsed, reset every 60 frames
-int frames = 0;
+unsigned int frames = 0;
 // seconds elapsed, never reset
-int seconds = 0;
+unsigned int seconds = 0;
+// set to 1 to require holding a direction for movement
+const unsigned int disable_momentum = 0;
+unsigned int left_wall_occupied = 0;
+unsigned int right_wall_occupied = 0;
+unsigned int top_wall_occupied = 0;
+unsigned int bottom_wall_occupied = 0;
 
 // goop
 UBYTE goop_coords[] = {0, 0};
 UBYTE goop_vel[] = {0, 0};
-const int goop_sprites[] = {0, 1};
-const int goop_speed = 3;
+const unsigned int goop_sprites[] = {0, 1};
+const unsigned int goop_speed = 3;
 
 void render_background()
 {
@@ -42,7 +48,7 @@ void render_background()
 void set_goop()
 {
   goop_coords[0] = SCREEN_WIDTH / 2;
-  goop_coords[1] = SCREEN_HEIGHT - 1;
+  goop_coords[1] = SCREEN_HEIGHT / 2;
 
   set_sprite_data(0, 8, goop_sprite_data);
   set_sprite_tile(goop_sprites[0], 0);
@@ -55,16 +61,16 @@ void input()
 {
   // goop movement
   if(key & (J_LEFT|J_RIGHT|J_UP|J_DOWN)) {
-    if(key & J_LEFT && goop_coords[0] > 0) {
+    if(key & J_LEFT && !left_wall_occupied) {
       goop_vel[0] = -1 * goop_speed;
     }
-    if(key & J_RIGHT && goop_coords[0] < SCREEN_WIDTH) {
+    if(key & J_RIGHT && !right_wall_occupied) {
       goop_vel[0] = 1 * goop_speed;
     }
-    if(key & J_UP) {
+    if(key & J_UP && !top_wall_occupied) {
       goop_vel[1] = -1 * goop_speed;
     }
-    if(key & J_DOWN) {
+    if(key & J_DOWN && !bottom_wall_occupied) {
       goop_vel[1] = 1 * goop_speed;
     }
   }
@@ -76,15 +82,49 @@ void input()
 void physics()
 {
   // goop
-  if(key & (J_LEFT|J_RIGHT)) {
+  if (disable_momentum) {
+    if(key & (J_LEFT|J_RIGHT)) {
+      goop_coords[0]+=goop_vel[0];
+    }
+    if(key & (J_UP|J_DOWN)) {
+      goop_coords[1]+=goop_vel[1];
+    }
+  } else {
     goop_coords[0]+=goop_vel[0];
-  }
-  if(key & (J_UP|J_DOWN)) {
     goop_coords[1]+=goop_vel[1];
   }
 }
 
 void collide() {
+  unsigned int stop = 0;
+
+  left_wall_occupied = 0;
+  right_wall_occupied = 0;
+  top_wall_occupied = 0;
+  bottom_wall_occupied = 0;
+
+  // goop collision with walls
+  if (goop_coords[0] >= SCREEN_WIDTH - (SPRITE_SIZE/2)) {
+    stop = 1;
+    right_wall_occupied = 1;
+  }
+  if (goop_coords[0] <= 0 + (SPRITE_SIZE/2)) {
+    stop = 1;
+    left_wall_occupied = 1;
+  }
+  if (goop_coords[1] >= SCREEN_HEIGHT) {
+    stop = 1;
+    bottom_wall_occupied = 1;
+  }
+  if (goop_coords[1] <= 0 + (SPRITE_SIZE)) {
+    stop = 1;
+    top_wall_occupied = 1;
+  }
+
+  if (stop) {
+    goop_vel[0] = 0;
+    goop_vel[1] = 0;
+  }
 }
 
 void move() {
@@ -130,8 +170,8 @@ void run()
     input();
     if (!game_over) {
       physics();
-      collide();
       move();
+      collide();
     }
 
     SHOW_BKG;
