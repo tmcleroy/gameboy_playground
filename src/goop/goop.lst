@@ -1,9 +1,9 @@
                               1 ;--------------------------------------------------------
                               2 ; File Created by SDCC : FreeWare ANSI-C Compiler
-                              3 ; Version 2.3.1 Fri Dec 11 20:11:21 2020
+                              3 ; Version 2.3.1 Fri Dec 11 20:15:24 2020
                               4 
                               5 ;--------------------------------------------------------
-                              6 	.module lcc69300
+                              6 	.module lcc70650
                               7 	
                               8 ;--------------------------------------------------------
                               9 ; Public variables in this module
@@ -18,13 +18,13 @@
                              18 	.globl _collide
                              19 	.globl _physics
                              20 	.globl _input
-                             21 	.globl _set_paddle
+                             21 	.globl _set_goop
                              22 	.globl _render_background
-                             23 	.globl _score_array
-                             24 	.globl _paddle_vel
-                             25 	.globl _paddle_coords
-                             26 	.globl _seconds
-                             27 	.globl _frames
+                             23 	.globl _goop_vel
+                             24 	.globl _goop_coords
+                             25 	.globl _seconds
+                             26 	.globl _frames
+                             27 	.globl _game_score_array
                              28 	.globl _game_score
                              29 	.globl _current_level
                              30 	.globl _game_over
@@ -34,11 +34,11 @@
                              34 	.globl _SPRITE_SIZE
                              35 	.globl _SCREEN_HEIGHT
                              36 	.globl _SCREEN_WIDTH
-                             37 	.globl _paddle_speed
-                             38 	.globl _paddle_sprites
+                             37 	.globl _goop_speed
+                             38 	.globl _goop_sprites
                              39 	.globl _INITIAL_LIVES
                              40 	.globl _FRAME_RATE
-                             41 	.globl _paddle_sprite_data
+                             41 	.globl _goop_sprite_data
                              42 	.globl _numbers
                              43 	.globl _blank_screen
                              44 	.globl _alpha
@@ -70,16 +70,16 @@
    000D                      70 	.ds 2
    000F                      71 _game_score::
    000F                      72 	.ds 2
-   0011                      73 _frames::
-   0011                      74 	.ds 2
-   0013                      75 _seconds::
-   0013                      76 	.ds 2
-   0015                      77 _paddle_coords::
-   0015                      78 	.ds 2
-   0017                      79 _paddle_vel::
-   0017                      80 	.ds 2
-   0019                      81 _score_array::
-   0019                      82 	.ds 4
+   0011                      73 _game_score_array::
+   0011                      74 	.ds 4
+   0015                      75 _frames::
+   0015                      76 	.ds 2
+   0017                      77 _seconds::
+   0017                      78 	.ds 2
+   0019                      79 _goop_coords::
+   0019                      80 	.ds 2
+   001B                      81 _goop_vel::
+   001B                      82 	.ds 2
                              83 ;--------------------------------------------------------
                              84 ; overlayable items in internal ram 
                              85 ;--------------------------------------------------------
@@ -161,46 +161,46 @@
    003D 36 00               161 	ld	(hl),#0x00
    003F 23                  162 	inc	hl
    0040 36 00               163 	ld	(hl),#0x00
-                            164 ;	goop.c 26
-                            165 ;	genAssign
-                            166 ;	AOP_HL for _frames
-   0042 21 11 00            167 	ld	hl,#_frames
-   0045 36 00               168 	ld	(hl),#0x00
-   0047 23                  169 	inc	hl
-   0048 36 00               170 	ld	(hl),#0x00
-                            171 ;	goop.c 28
-                            172 ;	genAssign
-                            173 ;	AOP_HL for _seconds
-   004A 21 13 00            174 	ld	hl,#_seconds
-   004D 36 00               175 	ld	(hl),#0x00
-   004F 23                  176 	inc	hl
-   0050 36 00               177 	ld	(hl),#0x00
-                            178 ;	goop.c 30
-                            179 ;	goop.c 188
-                            180 ;	genArrayInit
-                            181 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
-   0052 21 15 00            182 	ld	hl,#_paddle_coords
-   0055 CD 00 00            183 	call	__initrleblock
-   0058 02                  184 	.db	2
-   0059 00 00               185 	.db	0x00, 0x00
-   005B 00                  186 	.db	0
-                            187 ;	goop.c 31
-                            188 ;	goop.c 188
+                            164 ;	goop.c 25
+                            165 ;	goop.c 187
+                            166 ;	genArrayInit
+                            167 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
+   0042 21 11 00            168 	ld	hl,#_game_score_array
+   0045 CD 00 00            169 	call	__initrleblock
+   0048 04                  170 	.db	4
+   0049 30 30 30 30         171 	.db	0x30, 0x30, 0x30, 0x30
+   004D 00                  172 	.db	0
+                            173 ;	goop.c 27
+                            174 ;	genAssign
+                            175 ;	AOP_HL for _frames
+   004E 21 15 00            176 	ld	hl,#_frames
+   0051 36 00               177 	ld	(hl),#0x00
+   0053 23                  178 	inc	hl
+   0054 36 00               179 	ld	(hl),#0x00
+                            180 ;	goop.c 29
+                            181 ;	genAssign
+                            182 ;	AOP_HL for _seconds
+   0056 21 17 00            183 	ld	hl,#_seconds
+   0059 36 00               184 	ld	(hl),#0x00
+   005B 23                  185 	inc	hl
+   005C 36 00               186 	ld	(hl),#0x00
+                            187 ;	goop.c 32
+                            188 ;	goop.c 187
                             189 ;	genArrayInit
                             190 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
-   005C 21 17 00            191 	ld	hl,#_paddle_vel
-   005F CD 00 00            192 	call	__initrleblock
-   0062 02                  193 	.db	2
-   0063 00 00               194 	.db	0x00, 0x00
-   0065 00                  195 	.db	0
-                            196 ;	goop.c 36
-                            197 ;	goop.c 188
+   005E 21 19 00            191 	ld	hl,#_goop_coords
+   0061 CD 00 00            192 	call	__initrleblock
+   0064 02                  193 	.db	2
+   0065 00 00               194 	.db	0x00, 0x00
+   0067 00                  195 	.db	0
+                            196 ;	goop.c 33
+                            197 ;	goop.c 187
                             198 ;	genArrayInit
                             199 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
-   0066 21 19 00            200 	ld	hl,#_score_array
-   0069 CD 00 00            201 	call	__initrleblock
-   006C 04                  202 	.db	4
-   006D 30 30 30 30         203 	.db	0x30, 0x30, 0x30, 0x30
+   0068 21 1B 00            200 	ld	hl,#_goop_vel
+   006B CD 00 00            201 	call	__initrleblock
+   006E 02                  202 	.db	2
+   006F 00 00               203 	.db	0x00, 0x00
    0071 00                  204 	.db	0
                             205 ;--------------------------------------------------------
                             206 ; Home
@@ -211,7 +211,7 @@
                             211 ; code
                             212 ;--------------------------------------------------------
                             213 	.area _CODE
-                            214 ;	goop.c 38
+                            214 ;	goop.c 37
                             215 ;	genLabel
                             216 ;	genFunction
                             217 ;	---------------------------------
@@ -220,7 +220,7 @@
    0000                     220 ___render_background_start:
    0000                     221 _render_background:
                             222 	
-                            223 ;	goop.c 41
+                            223 ;	goop.c 40
                             224 ;	genIpush
                             225 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
    0000 21 1F 00            226 	ld	hl,#_alpha
@@ -231,7 +231,7 @@
                             231 ;	genCall
    0008 CD 00 00            232 	call	_set_bkg_data
    000B E8 04               233 	lda	sp,4(sp)
-                            234 ;	goop.c 43
+                            234 ;	goop.c 42
                             235 ;	genIpush
                             236 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
    000D 21 1F 03            237 	ld	hl,#_blank_screen
@@ -1392,7 +1392,7 @@
    048E 07                 1392 	.db #0x07
    048F 08                 1393 	.db #0x08
    0490 09                 1394 	.db #0x09
-   0491                    1395 _paddle_sprite_data:
+   0491                    1395 _goop_sprite_data:
    0491 00                 1396 	.db #0x00
    0492 00                 1397 	.db #0x00
    0493 00                 1398 	.db #0x00
@@ -1461,21 +1461,21 @@
    04D1 3C 00              1461 	.dw #0x003C
    04D3                    1462 _INITIAL_LIVES:
    04D3 03 00              1463 	.dw #0x0003
-   04D5                    1464 _paddle_sprites:
+   04D5                    1464 _goop_sprites:
    04D5 00 00              1465 	.dw #0x0000
    04D7 01 00              1466 	.dw #0x0001
-   04D9                    1467 _paddle_speed:
+   04D9                    1467 _goop_speed:
    04D9 03 00              1468 	.dw #0x0003
-                           1469 ;	goop.c 46
+                           1469 ;	goop.c 45
                            1470 ;	genLabel
                            1471 ;	genFunction
                            1472 ;	---------------------------------
-                           1473 ; Function set_paddle
+                           1473 ; Function set_goop
                            1474 ; ---------------------------------
-   04DB                    1475 ___set_paddle_start:
-   04DB                    1476 _set_paddle:
+   04DB                    1475 ___set_goop_start:
+   04DB                    1476 _set_goop:
    04DB E8 F7              1477 	lda	sp,-9(sp)
-                           1478 ;	goop.c 48
+                           1478 ;	goop.c 47
                            1479 ;	genRightShift
                            1480 ;	AOP_HL for _SCREEN_WIDTH
    04DD 21 00 00           1481 	ld	hl,#_SCREEN_WIDTH
@@ -1487,15 +1487,15 @@
                            1487 ;	genCast
                            1488 ; Removed redundent load
                            1489 ;	genAssign (pointer)
-   04E7 11 15 00           1490 	ld	de,#_paddle_coords
+   04E7 11 19 00           1490 	ld	de,#_goop_coords
    04EA 79                 1491 	ld	a,c
    04EB 12                 1492 	ld	(de),a
-                           1493 ;	goop.c 49
+                           1493 ;	goop.c 48
                            1494 ;	genPlus
-                           1495 ;	AOP_STK for _set_paddle_sloc0_1_0
+                           1495 ;	AOP_STK for _set_goop_sloc0_1_0
                            1496 ;	genPlusIncr
                            1497 ;	Can't optimise plus by inc, falling back to the normal way
-   04EC 11 15 00           1498 	ld	de,#_paddle_coords
+   04EC 11 19 00           1498 	ld	de,#_goop_coords
    04EF 21 01 00           1499 	ld	hl,#0x0001
    04F2 19                 1500 	add	hl,de
    04F3 7D                 1501 	ld	a,l
@@ -1505,7 +1505,7 @@
    04F8 72                 1505 	ld	(hl),d
                            1506 ;	genMinus
                            1507 ;	AOP_HL for _SCREEN_HEIGHT
-                           1508 ;	AOP_STK for _set_paddle_sloc1_1_0
+                           1508 ;	AOP_STK for _set_goop_sloc1_1_0
    04F9 21 02 00           1509 	ld	hl,#_SCREEN_HEIGHT
    04FC 5E                 1510 	ld	e,(hl)
    04FD 23                 1511 	inc	hl
@@ -1520,10 +1520,10 @@
    0509 32                 1520 	ld      (hl-),a
    050A 73                 1521 	ld	(hl),e
                            1522 ;	genCast
-                           1523 ;	AOP_STK for _set_paddle_sloc1_1_0
+                           1523 ;	AOP_STK for _set_goop_sloc1_1_0
    050B 46                 1524 	ld	b,(hl)
                            1525 ;	genAssign (pointer)
-                           1526 ;	AOP_STK for _set_paddle_sloc0_1_0
+                           1526 ;	AOP_STK for _set_goop_sloc0_1_0
    050C 23                 1527 	inc	hl
    050D 23                 1528 	inc	hl
    050E 5E                 1529 	ld	e,(hl)
@@ -1531,11 +1531,11 @@
    0510 56                 1531 	ld	d,(hl)
    0511 78                 1532 	ld	a,b
    0512 12                 1533 	ld	(de),a
-                           1534 ;	goop.c 51
+                           1534 ;	goop.c 50
                            1535 ;	genIpush
                            1536 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 1 deSending: 0
    0513 C5                 1537 	push	bc
-   0514 21 91 04           1538 	ld	hl,#_paddle_sprite_data
+   0514 21 91 04           1538 	ld	hl,#_goop_sprite_data
    0517 E5                 1539 	push	hl
                            1540 ;	genIpush
    0518 21 00 08           1541 	ld	hl,#0x0800
@@ -1544,10 +1544,10 @@
    051C CD 00 00           1544 	call	_set_sprite_data
    051F E8 04              1545 	lda	sp,4(sp)
    0521 C1                 1546 	pop	bc
-                           1547 ;	goop.c 52
+                           1547 ;	goop.c 51
                            1548 ;	genPointerGet
-                           1549 ;	AOP_STK for _set_paddle_sloc1_1_0
-   0522 11 D5 04           1550 	ld	de,#_paddle_sprites
+                           1549 ;	AOP_STK for _set_goop_sloc1_1_0
+   0522 11 D5 04           1550 	ld	de,#_goop_sprites
    0525 1A                 1551 	ld	a,(de)
    0526 F8 05              1552 	lda	hl,5(sp)
    0528 77                 1553 	ld	(hl),a
@@ -1555,8 +1555,8 @@
    052A 1A                 1555 	ld	a,(de)
    052B 23                 1556 	inc	hl
                            1557 ;	genCast
-                           1558 ;	AOP_STK for _set_paddle_sloc1_1_0
-                           1559 ;	AOP_STK for _set_paddle_sloc0_1_0
+                           1558 ;	AOP_STK for _set_goop_sloc1_1_0
+                           1559 ;	AOP_STK for _set_goop_sloc0_1_0
    052C 32                 1560 	ld      (hl-),a
    052D 2A                 1561 	ld	a,(hl+)
    052E 23                 1562 	inc	hl
@@ -1568,7 +1568,7 @@
    0533 F5                 1568 	push	af
    0534 33                 1569 	inc	sp
                            1570 ;	genIpush
-                           1571 ;	AOP_STK for _set_paddle_sloc0_1_0
+                           1571 ;	AOP_STK for _set_goop_sloc0_1_0
    0535 7E                 1572 	ld	a,(hl)
    0536 F5                 1573 	push	af
    0537 33                 1574 	inc	sp
@@ -1576,20 +1576,20 @@
    0538 CD 00 00           1576 	call	_set_sprite_tile
    053B E8 02              1577 	lda	sp,2(sp)
    053D C1                 1578 	pop	bc
-                           1579 ;	goop.c 53
+                           1579 ;	goop.c 52
                            1580 ;	genPlus
-                           1581 ;	AOP_STK for _set_paddle_sloc1_1_0
+                           1581 ;	AOP_STK for _set_goop_sloc1_1_0
                            1582 ;	genPlusIncr
                            1583 ;	Can't optimise plus by inc, falling back to the normal way
-   053E 11 D5 04           1584 	ld	de,#_paddle_sprites
+   053E 11 D5 04           1584 	ld	de,#_goop_sprites
    0541 21 02 00           1585 	ld	hl,#0x0002
    0544 19                 1586 	add	hl,de
    0545 7D                 1587 	ld	a,l
    0546 54                 1588 	ld	d,h
    0547 F8 05              1589 	lda	hl,5(sp)
                            1590 ;	genPointerGet
-                           1591 ;	AOP_STK for _set_paddle_sloc1_1_0
-                           1592 ;	AOP_STK for _set_paddle_sloc0_1_0
+                           1591 ;	AOP_STK for _set_goop_sloc1_1_0
+                           1592 ;	AOP_STK for _set_goop_sloc0_1_0
    0549 22                 1593 	ld	(hl+),a
    054A 72                 1594 	ld	(hl),d
    054B 5F                 1595 	ld	e,a
@@ -1600,8 +1600,8 @@
    0550 1A                 1600 	ld	a,(de)
    0551 23                 1601 	inc	hl
                            1602 ;	genCast
-                           1603 ;	AOP_STK for _set_paddle_sloc0_1_0
-                           1604 ;	AOP_STK for _set_paddle_sloc2_1_0
+                           1603 ;	AOP_STK for _set_goop_sloc0_1_0
+                           1604 ;	AOP_STK for _set_goop_sloc2_1_0
    0552 32                 1605 	ld      (hl-),a
    0553 7E                 1606 	ld	a,(hl)
    0554 F8 04              1607 	lda	hl,4(sp)
@@ -1613,7 +1613,7 @@
    055A F5                 1613 	push	af
    055B 33                 1614 	inc	sp
                            1615 ;	genIpush
-                           1616 ;	AOP_STK for _set_paddle_sloc2_1_0
+                           1616 ;	AOP_STK for _set_goop_sloc2_1_0
    055C 7E                 1617 	ld	a,(hl)
    055D F5                 1618 	push	af
    055E 33                 1619 	inc	sp
@@ -1621,10 +1621,10 @@
    055F CD 00 00           1621 	call	_set_sprite_tile
    0562 E8 02              1622 	lda	sp,2(sp)
    0564 C1                 1623 	pop	bc
-                           1624 ;	goop.c 54
+                           1624 ;	goop.c 53
                            1625 ;	genPointerGet
-                           1626 ;	AOP_STK for _set_paddle_sloc0_1_0
-   0565 11 D5 04           1627 	ld	de,#_paddle_sprites
+                           1626 ;	AOP_STK for _set_goop_sloc0_1_0
+   0565 11 D5 04           1627 	ld	de,#_goop_sprites
    0568 1A                 1628 	ld	a,(de)
    0569 F8 07              1629 	lda	hl,7(sp)
    056B 77                 1630 	ld	(hl),a
@@ -1632,8 +1632,8 @@
    056D 1A                 1632 	ld	a,(de)
    056E 23                 1633 	inc	hl
                            1634 ;	genCast
-                           1635 ;	AOP_STK for _set_paddle_sloc0_1_0
-                           1636 ;	AOP_STK for _set_paddle_sloc2_1_0
+                           1635 ;	AOP_STK for _set_goop_sloc0_1_0
+                           1636 ;	AOP_STK for _set_goop_sloc2_1_0
    056F 32                 1637 	ld      (hl-),a
    0570 7E                 1638 	ld	a,(hl)
    0571 F8 04              1639 	lda	hl,4(sp)
@@ -1649,7 +1649,7 @@
    0579 F5                 1649 	push	af
    057A 33                 1650 	inc	sp
                            1651 ;	genIpush
-                           1652 ;	AOP_STK for _set_paddle_sloc2_1_0
+                           1652 ;	AOP_STK for _set_goop_sloc2_1_0
    057B 7E                 1653 	ld	a,(hl)
    057C F5                 1654 	push	af
    057D 33                 1655 	inc	sp
@@ -1657,10 +1657,10 @@
    057E CD 00 00           1657 	call	_move_sprite
    0581 E8 03              1658 	lda	sp,3(sp)
    0583 C1                 1659 	pop	bc
-                           1660 ;	goop.c 55
+                           1660 ;	goop.c 54
                            1661 ;	genRightShift
                            1662 ;	AOP_HL for _SPRITE_SIZE
-                           1663 ;	AOP_STK for _set_paddle_sloc0_1_0
+                           1663 ;	AOP_STK for _set_goop_sloc0_1_0
    0584 21 04 00           1664 	ld	hl,#_SPRITE_SIZE
    0587 7E                 1665 	ld	a,(hl)
    0588 F8 07              1666 	lda	hl,7(sp)
@@ -1673,15 +1673,15 @@
    0594 2B                 1673 	dec	hl
    0595 CB 1E              1674 	rr	(hl)
                            1675 ;	genCast
-                           1676 ;	AOP_STK for _set_paddle_sloc3_1_0
+                           1676 ;	AOP_STK for _set_goop_sloc3_1_0
    0597 F8 02              1677 	lda	hl,2(sp)
    0599 71                 1678 	ld	(hl),c
    059A 23                 1679 	inc	hl
    059B 36 00              1680 	ld	(hl),#0x00
                            1681 ;	genPlus
-                           1682 ;	AOP_STK for _set_paddle_sloc3_1_0
-                           1683 ;	AOP_STK for _set_paddle_sloc0_1_0
-                           1684 ;	AOP_STK for _set_paddle_sloc4_1_0
+                           1682 ;	AOP_STK for _set_goop_sloc3_1_0
+                           1683 ;	AOP_STK for _set_goop_sloc0_1_0
+                           1684 ;	AOP_STK for _set_goop_sloc4_1_0
                            1685 ;	Can't optimise plus by inc, falling back to the normal way
    059D 2B                 1686 	dec	hl
    059E 5E                 1687 	ld	e,(hl)
@@ -1698,12 +1698,12 @@
    05AB 22                 1698 	ld	(hl+),a
    05AC 72                 1699 	ld	(hl),d
                            1700 ;	genCast
-                           1701 ;	AOP_STK for _set_paddle_sloc4_1_0
+                           1701 ;	AOP_STK for _set_goop_sloc4_1_0
    05AD 2B                 1702 	dec	hl
    05AE 4E                 1703 	ld	c,(hl)
                            1704 ;	genPointerGet
-                           1705 ;	AOP_STK for _set_paddle_sloc1_1_0
-                           1706 ;	AOP_STK for _set_paddle_sloc4_1_0
+                           1705 ;	AOP_STK for _set_goop_sloc1_1_0
+                           1706 ;	AOP_STK for _set_goop_sloc4_1_0
    05AF F8 05              1707 	lda	hl,5(sp)
    05B1 5E                 1708 	ld	e,(hl)
    05B2 23                 1709 	inc	hl
@@ -1715,8 +1715,8 @@
    05B9 1A                 1715 	ld	a,(de)
    05BA 23                 1716 	inc	hl
                            1717 ;	genCast
-                           1718 ;	AOP_STK for _set_paddle_sloc4_1_0
-                           1719 ;	AOP_STK for _set_paddle_sloc3_1_0
+                           1718 ;	AOP_STK for _set_goop_sloc4_1_0
+                           1719 ;	AOP_STK for _set_goop_sloc3_1_0
    05BB 32                 1720 	ld      (hl-),a
    05BC 2A                 1721 	ld	a,(hl+)
    05BD 23                 1722 	inc	hl
@@ -1731,7 +1731,7 @@
    05C3 F5                 1731 	push	af
    05C4 33                 1732 	inc	sp
                            1733 ;	genIpush
-                           1734 ;	AOP_STK for _set_paddle_sloc3_1_0
+                           1734 ;	AOP_STK for _set_goop_sloc3_1_0
    05C5 7E                 1735 	ld	a,(hl)
    05C6 F5                 1736 	push	af
    05C7 33                 1737 	inc	sp
@@ -1743,8 +1743,8 @@
                            1743 ;	genEndFunction
    05CD E8 09              1744 	lda	sp,9(sp)
    05CF C9                 1745 	ret
-   05D0                    1746 ___set_paddle_end:
-                           1747 ;	goop.c 58
+   05D0                    1746 ___set_goop_end:
+                           1747 ;	goop.c 57
                            1748 ;	genLabel
                            1749 ;	genFunction
                            1750 ;	---------------------------------
@@ -1753,7 +1753,7 @@
    05D0                    1753 ___input_start:
    05D0                    1754 _input:
    05D0 E8 FC              1755 	lda	sp,-4(sp)
-                           1756 ;	goop.c 61
+                           1756 ;	goop.c 60
                            1757 ;	genAnd
                            1758 ;	AOP_HL for _key
    05D2 21 06 00           1759 	ld	hl,#_key
@@ -1762,7 +1762,7 @@
    05D8 20 03              1762 	jr	nz,00122$
    05DA C3 B1 06           1763 	jp	00113$
    05DD                    1764 00122$:
-                           1765 ;	goop.c 62
+                           1765 ;	goop.c 61
                            1766 ;	genAnd
                            1767 ;	AOP_HL for _key
    05DD 21 06 00           1768 	ld	hl,#_key
@@ -1772,17 +1772,17 @@
    05E5 C3 22 06           1772 	jp	00102$
    05E8                    1773 00123$:
                            1774 ;	genPointerGet
-   05E8 11 15 00           1775 	ld	de,#_paddle_coords
+   05E8 11 19 00           1775 	ld	de,#_goop_coords
    05EB 1A                 1776 	ld	a,(de)
    05EC 4F                 1777 	ld	c,a
                            1778 ;	genCmpGt
    05ED 3E 00              1779 	ld	a,#0x00
    05EF 91                 1780 	sub	a,c
    05F0 D2 22 06           1781 	jp	nc,00102$
-                           1782 ;	goop.c 63
+                           1782 ;	goop.c 62
                            1783 ;	genAssign
-                           1784 ;	AOP_HL for _paddle_speed
-   05F3 21 D9 04           1785 	ld	hl,#_paddle_speed
+                           1784 ;	AOP_HL for _goop_speed
+   05F3 21 D9 04           1785 	ld	hl,#_goop_speed
    05F6 4E                 1786 	ld	c,(hl)
    05F7 23                 1787 	inc	hl
    05F8 46                 1788 	ld	b,(hl)
@@ -1826,11 +1826,11 @@
                            1826 ;	genCast
    061D 79                 1827 	ld	a,c
                            1828 ;	genAssign (pointer)
-   061E 11 17 00           1829 	ld	de,#_paddle_vel
+   061E 11 1B 00           1829 	ld	de,#_goop_vel
    0621 12                 1830 	ld	(de),a
                            1831 ;	genLabel
    0622                    1832 00102$:
-                           1833 ;	goop.c 65
+                           1833 ;	goop.c 64
                            1834 ;	genAnd
                            1835 ;	AOP_HL for _key
    0622 21 06 00           1836 	ld	hl,#_key
@@ -1840,7 +1840,7 @@
    062A C3 53 06           1840 	jp	00105$
    062D                    1841 00124$:
                            1842 ;	genPointerGet
-   062D 11 15 00           1843 	ld	de,#_paddle_coords
+   062D 11 19 00           1843 	ld	de,#_goop_coords
    0630 1A                 1844 	ld	a,(de)
    0631 4F                 1845 	ld	c,a
                            1846 ;	genCast
@@ -1864,21 +1864,21 @@
    0643 7E                 1864 	ld	a,(hl)
    0644 98                 1865 	sbc	a,b
    0645 D2 53 06           1866 	jp	nc,00105$
-                           1867 ;	goop.c 66
+                           1867 ;	goop.c 65
                            1868 ;	genAssign
-                           1869 ;	AOP_HL for _paddle_speed
-   0648 21 D9 04           1870 	ld	hl,#_paddle_speed
+                           1869 ;	AOP_HL for _goop_speed
+   0648 21 D9 04           1870 	ld	hl,#_goop_speed
    064B 4E                 1871 	ld	c,(hl)
    064C 23                 1872 	inc	hl
    064D 46                 1873 	ld	b,(hl)
                            1874 ;	genCast
    064E 79                 1875 	ld	a,c
                            1876 ;	genAssign (pointer)
-   064F 11 17 00           1877 	ld	de,#_paddle_vel
+   064F 11 1B 00           1877 	ld	de,#_goop_vel
    0652 12                 1878 	ld	(de),a
                            1879 ;	genLabel
    0653                    1880 00105$:
-                           1881 ;	goop.c 68
+                           1881 ;	goop.c 67
                            1882 ;	genAnd
                            1883 ;	AOP_HL for _key
    0653 21 06 00           1884 	ld	hl,#_key
@@ -1887,14 +1887,14 @@
    0659 20 03              1887 	jr	nz,00125$
    065B C3 97 06           1888 	jp	00108$
    065E                    1889 00125$:
-                           1890 ;	goop.c 69
+                           1890 ;	goop.c 68
                            1891 ;	genPlus
                            1892 ;	genPlusIncr
-   065E 01 18 00           1893 	ld	bc,#_paddle_vel + 1
+   065E 01 1C 00           1893 	ld	bc,#_goop_vel + 1
                            1894 ;	genAssign
-                           1895 ;	AOP_HL for _paddle_speed
+                           1895 ;	AOP_HL for _goop_speed
                            1896 ;	AOP_STK for _input_sloc0_1_0
-   0661 21 D9 04           1897 	ld	hl,#_paddle_speed
+   0661 21 D9 04           1897 	ld	hl,#_goop_speed
    0664 2A                 1898 	ld	a,(hl+)
    0665 5E                 1899 	ld	e,(hl)
    0666 F8 02              1900 	lda	hl,2(sp)
@@ -1952,7 +1952,7 @@
    0696 02                 1952 	ld	(bc),a
                            1953 ;	genLabel
    0697                    1954 00108$:
-                           1955 ;	goop.c 71
+                           1955 ;	goop.c 70
                            1956 ;	genAnd
                            1957 ;	AOP_HL for _key
    0697 21 06 00           1958 	ld	hl,#_key
@@ -1961,14 +1961,14 @@
    069D 20 03              1961 	jr	nz,00126$
    069F C3 B1 06           1962 	jp	00113$
    06A2                    1963 00126$:
-                           1964 ;	goop.c 72
+                           1964 ;	goop.c 71
                            1965 ;	genPlus
                            1966 ;	genPlusIncr
-   06A2 01 18 00           1967 	ld	bc,#_paddle_vel + 1
+   06A2 01 1C 00           1967 	ld	bc,#_goop_vel + 1
                            1968 ;	genAssign
-                           1969 ;	AOP_HL for _paddle_speed
+                           1969 ;	AOP_HL for _goop_speed
                            1970 ;	AOP_STK for _input_sloc1_1_0
-   06A5 21 D9 04           1971 	ld	hl,#_paddle_speed
+   06A5 21 D9 04           1971 	ld	hl,#_goop_speed
    06A8 2A                 1972 	ld	a,(hl+)
    06A9 5E                 1973 	ld	e,(hl)
    06AA F8 00              1974 	lda	hl,0(sp)
@@ -1980,14 +1980,14 @@
    06AF 7E                 1980 	ld	a,(hl)
                            1981 ;	genAssign (pointer)
    06B0 02                 1982 	ld	(bc),a
-                           1983 ;	goop.c 76
+                           1983 ;	goop.c 75
                            1984 ;	genLabel
    06B1                    1985 00113$:
                            1986 ;	genEndFunction
    06B1 E8 04              1987 	lda	sp,4(sp)
    06B3 C9                 1988 	ret
    06B4                    1989 ___input_end:
-                           1990 ;	goop.c 80
+                           1990 ;	goop.c 79
                            1991 ;	genLabel
                            1992 ;	genFunction
                            1993 ;	---------------------------------
@@ -1996,7 +1996,7 @@
    06B4                    1996 ___physics_start:
    06B4                    1997 _physics:
    06B4 E8 FC              1998 	lda	sp,-4(sp)
-                           1999 ;	goop.c 83
+                           1999 ;	goop.c 82
                            2000 ;	genAnd
                            2001 ;	AOP_HL for _key
    06B6 21 06 00           2002 	ld	hl,#_key
@@ -2005,13 +2005,13 @@
    06BC 20 03              2005 	jr	nz,00109$
    06BE C3 D1 06           2006 	jp	00102$
    06C1                    2007 00109$:
-                           2008 ;	goop.c 84
+                           2008 ;	goop.c 83
                            2009 ;	genPointerGet
-   06C1 11 15 00           2010 	ld	de,#_paddle_coords
+   06C1 11 19 00           2010 	ld	de,#_goop_coords
    06C4 1A                 2011 	ld	a,(de)
    06C5 4F                 2012 	ld	c,a
                            2013 ;	genPointerGet
-   06C6 11 17 00           2014 	ld	de,#_paddle_vel
+   06C6 11 1B 00           2014 	ld	de,#_goop_vel
    06C9 1A                 2015 	ld	a,(de)
    06CA 47                 2016 	ld	b,a
                            2017 ;	genPlus
@@ -2019,11 +2019,11 @@
    06CB 79                 2019 	ld	a,c
    06CC 80                 2020 	add	a,b
                            2021 ;	genAssign (pointer)
-   06CD 11 15 00           2022 	ld	de,#_paddle_coords
+   06CD 11 19 00           2022 	ld	de,#_goop_coords
    06D0 12                 2023 	ld	(de),a
                            2024 ;	genLabel
    06D1                    2025 00102$:
-                           2026 ;	goop.c 86
+                           2026 ;	goop.c 85
                            2027 ;	genAnd
                            2028 ;	AOP_HL for _key
    06D1 21 06 00           2029 	ld	hl,#_key
@@ -2032,10 +2032,10 @@
    06D7 20 03              2032 	jr	nz,00110$
    06D9 C3 FC 06           2033 	jp	00105$
    06DC                    2034 00110$:
-                           2035 ;	goop.c 87
+                           2035 ;	goop.c 86
                            2036 ;	genPlus
                            2037 ;	genPlusIncr
-   06DC 01 16 00           2038 	ld	bc,#_paddle_coords + 1
+   06DC 01 1A 00           2038 	ld	bc,#_goop_coords + 1
                            2039 ;	genPointerGet
                            2040 ;	AOP_STK for _physics_sloc0_1_0
    06DF 0A                 2041 	ld	a,(bc)
@@ -2045,7 +2045,7 @@
                            2045 ;	AOP_STK for _physics_sloc1_1_0
                            2046 ;	genPlusIncr
                            2047 ;	Can't optimise plus by inc, falling back to the normal way
-   06E3 11 17 00           2048 	ld	de,#_paddle_vel
+   06E3 11 1B 00           2048 	ld	de,#_goop_vel
    06E6 21 01 00           2049 	ld	hl,#0x0001
    06E9 19                 2050 	add	hl,de
    06EA 7D                 2051 	ld	a,l
@@ -2077,7 +2077,7 @@
    06FC E8 04              2077 	lda	sp,4(sp)
    06FE C9                 2078 	ret
    06FF                    2079 ___physics_end:
-                           2080 ;	goop.c 91
+                           2080 ;	goop.c 90
                            2081 ;	genLabel
                            2082 ;	genFunction
                            2083 ;	---------------------------------
@@ -2086,14 +2086,14 @@
    06FF                    2086 ___collide_start:
    06FF                    2087 _collide:
                            2088 	
-                           2089 ;	goop.c 92
+                           2089 ;	goop.c 91
                            2090 ;	genLabel
    06FF                    2091 00101$:
                            2092 ;	genEndFunction
                            2093 	
    06FF C9                 2094 	ret
    0700                    2095 ___collide_end:
-                           2096 ;	goop.c 94
+                           2096 ;	goop.c 93
                            2097 ;	genLabel
                            2098 ;	genFunction
                            2099 ;	---------------------------------
@@ -2102,10 +2102,10 @@
    0700                    2102 ___move_start:
    0700                    2103 _move:
    0700 E8 FE              2104 	lda	sp,-2(sp)
-                           2105 ;	goop.c 96
+                           2105 ;	goop.c 95
                            2106 ;	genPlus
                            2107 ;	genPlusIncr
-   0702 01 16 00           2108 	ld	bc,#_paddle_coords + 1
+   0702 01 1A 00           2108 	ld	bc,#_goop_coords + 1
                            2109 ;	genPointerGet
                            2110 ;	AOP_STK for _move_sloc0_1_0
    0705 0A                 2111 	ld	a,(bc)
@@ -2113,7 +2113,7 @@
    0708 77                 2113 	ld	(hl),a
                            2114 ;	genPointerGet
                            2115 ;	AOP_STK for _move_sloc1_1_0
-   0709 11 15 00           2116 	ld	de,#_paddle_coords
+   0709 11 19 00           2116 	ld	de,#_goop_coords
    070C 1A                 2117 	ld	a,(de)
    070D 2B                 2118 	dec	hl
    070E 77                 2119 	ld	(hl),a
@@ -2139,12 +2139,12 @@
    071C CD 00 00           2139 	call	_move_sprite
    071F E8 03              2140 	lda	sp,3(sp)
    0721 C1                 2141 	pop	bc
-                           2142 ;	goop.c 97
+                           2142 ;	goop.c 96
                            2143 ;	genPointerGet
    0722 0A                 2144 	ld	a,(bc)
    0723 4F                 2145 	ld	c,a
                            2146 ;	genPointerGet
-   0724 11 15 00           2147 	ld	de,#_paddle_coords
+   0724 11 19 00           2147 	ld	de,#_goop_coords
    0727 1A                 2148 	ld	a,(de)
                            2149 ;	genPlus
                            2150 ;	genPlusIncr
@@ -2174,7 +2174,7 @@
    073B E8 02              2174 	lda	sp,2(sp)
    073D C9                 2175 	ret
    073E                    2176 ___move_end:
-                           2177 ;	goop.c 100
+                           2177 ;	goop.c 99
                            2178 ;	genLabel
                            2179 ;	genFunction
                            2180 ;	---------------------------------
@@ -2183,14 +2183,14 @@
    073E                    2183 ___score_start:
    073E                    2184 _score:
                            2185 	
-                           2186 ;	goop.c 101
+                           2186 ;	goop.c 100
                            2187 ;	genLabel
    073E                    2188 00101$:
                            2189 ;	genEndFunction
                            2190 	
    073E C9                 2191 	ret
    073F                    2192 ___score_end:
-                           2193 ;	goop.c 103
+                           2193 ;	goop.c 102
                            2194 ;	genLabel
                            2195 ;	genFunction
                            2196 ;	---------------------------------
@@ -2199,7 +2199,7 @@
    073F                    2199 ___render_score_start:
    073F                    2200 _render_score:
    073F E8 FC              2201 	lda	sp,-4(sp)
-                           2202 ;	goop.c 104
+                           2202 ;	goop.c 103
                            2203 ;	genAssign
                            2204 ;	AOP_HL for _FRAME_RATE
    0741 21 D1 04           2205 	ld	hl,#_FRAME_RATE
@@ -2214,7 +2214,7 @@
    074B C5                 2214 	push	bc
                            2215 ;	genIpush
                            2216 ;	AOP_HL for _frames
-   074C 21 11 00           2217 	ld	hl,#_frames
+   074C 21 15 00           2217 	ld	hl,#_frames
    074F 2A                 2218 	ld	a,(hl+)
    0750 66                 2219 	ld	h,(hl)
    0751 6F                 2220 	ld	l,a
@@ -2233,7 +2233,7 @@
    0761                    2233 00108$:
    0761 C3 3D 08           2234 	jp	00102$
    0764                    2235 00109$:
-                           2236 ;	goop.c 106
+                           2236 ;	goop.c 105
                            2237 ;	genIpush
                            2238 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
    0764 21 E8 03           2239 	ld	hl,#0x03E8
@@ -2270,12 +2270,12 @@
                            2270 ;	genPointerGet
    0788 0A                 2271 	ld	a,(bc)
                            2272 ;	genAssign (pointer)
-   0789 11 19 00           2273 	ld	de,#_score_array
+   0789 11 11 00           2273 	ld	de,#_game_score_array
    078C 12                 2274 	ld	(de),a
-                           2275 ;	goop.c 107
+                           2275 ;	goop.c 106
                            2276 ;	genPlus
                            2277 ;	genPlusIncr
-   078D 01 1A 00           2278 	ld	bc,#_score_array + 1
+   078D 01 12 00           2278 	ld	bc,#_game_score_array + 1
                            2279 ;	genIpush
                            2280 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 1 deSending: 0
    0790 C5                 2281 	push	bc
@@ -2339,10 +2339,10 @@
    07CD 1A                 2339 	ld	a,(de)
                            2340 ;	genAssign (pointer)
    07CE 02                 2341 	ld	(bc),a
-                           2342 ;	goop.c 108
+                           2342 ;	goop.c 107
                            2343 ;	genPlus
                            2344 ;	genPlusIncr
-   07CF 01 1B 00           2345 	ld	bc,#_score_array + 2
+   07CF 01 13 00           2345 	ld	bc,#_game_score_array + 2
                            2346 ;	genIpush
                            2347 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 1 deSending: 0
    07D2 C5                 2348 	push	bc
@@ -2406,10 +2406,10 @@
    080F 1A                 2406 	ld	a,(de)
                            2407 ;	genAssign (pointer)
    0810 02                 2408 	ld	(bc),a
-                           2409 ;	goop.c 109
+                           2409 ;	goop.c 108
                            2410 ;	genPlus
                            2411 ;	genPlusIncr
-   0811 01 1C 00           2412 	ld	bc,#_score_array + 3
+   0811 01 14 00           2412 	ld	bc,#_game_score_array + 3
                            2413 ;	genIpush
                            2414 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 1 deSending: 0
    0814 C5                 2415 	push	bc
@@ -2454,11 +2454,11 @@
    083C 02                 2454 	ld	(bc),a
                            2455 ;	genLabel
    083D                    2456 00102$:
-                           2457 ;	goop.c 118
-                           2458 ;	goop.c 114
+                           2457 ;	goop.c 117
+                           2458 ;	goop.c 113
                            2459 ;	genIpush
                            2460 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
-   083D 21 19 00           2461 	ld	hl,#_score_array
+   083D 21 11 00           2461 	ld	hl,#_game_score_array
    0840 E5                 2462 	push	hl
                            2463 ;	genIpush
    0841 21 04 01           2464 	ld	hl,#0x0104
@@ -2475,7 +2475,7 @@
    084E E8 04              2475 	lda	sp,4(sp)
    0850 C9                 2476 	ret
    0851                    2477 ___render_score_end:
-                           2478 ;	goop.c 126
+                           2478 ;	goop.c 125
                            2479 ;	genLabel
                            2480 ;	genFunction
                            2481 ;	---------------------------------
@@ -2484,14 +2484,14 @@
    0851                    2484 ___state_game_over_start:
    0851                    2485 _state_game_over:
    0851 E8 FD              2486 	lda	sp,-3(sp)
-                           2487 ;	goop.c 127
+                           2487 ;	goop.c 126
                            2488 ;	genAssign
                            2489 ;	AOP_HL for _game_over
    0853 21 0B 00           2490 	ld	hl,#_game_over
    0856 36 01              2491 	ld	(hl),#0x01
    0858 23                 2492 	inc	hl
    0859 36 00              2493 	ld	(hl),#0x00
-                           2494 ;	goop.c 128
+                           2494 ;	goop.c 127
                            2495 ;	genAssign
    085B 01 40 FF           2496 	ld	bc,#0xFF40
                            2497 ;	genAssign
@@ -2523,7 +2523,7 @@
    0871 E8 03              2523 	lda	sp,3(sp)
    0873 C9                 2524 	ret
    0874                    2525 ___state_game_over_end:
-                           2526 ;	goop.c 131
+                           2526 ;	goop.c 130
                            2527 ;	genLabel
                            2528 ;	genFunction
                            2529 ;	---------------------------------
@@ -2532,18 +2532,18 @@
    0874                    2532 ___state_game_init_start:
    0874                    2533 _state_game_init:
    0874 E8 FD              2534 	lda	sp,-3(sp)
-                           2535 ;	goop.c 132
+                           2535 ;	goop.c 131
                            2536 ;	genAssign
                            2537 ;	AOP_HL for _game_over
    0876 21 0B 00           2538 	ld	hl,#_game_over
    0879 36 00              2539 	ld	(hl),#0x00
    087B 23                 2540 	inc	hl
    087C 36 00              2541 	ld	(hl),#0x00
-                           2542 ;	goop.c 133
+                           2542 ;	goop.c 132
                            2543 ;	genCall
                            2544 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
-   087E CD DB 04           2545 	call	_set_paddle
-                           2546 ;	goop.c 134
+   087E CD DB 04           2545 	call	_set_goop
+                           2546 ;	goop.c 133
                            2547 ;	genAssign
    0881 01 40 FF           2548 	ld	bc,#0xFF40
                            2549 ;	genAssign
@@ -2575,7 +2575,7 @@
    0897 E8 03              2575 	lda	sp,3(sp)
    0899 C9                 2576 	ret
    089A                    2577 ___state_game_init_end:
-                           2578 ;	goop.c 137
+                           2578 ;	goop.c 136
                            2579 ;	genLabel
                            2580 ;	genFunction
                            2581 ;	---------------------------------
@@ -2584,35 +2584,35 @@
    089A                    2584 ___state_game_restart_start:
    089A                    2585 _state_game_restart:
                            2586 	
-                           2587 ;	goop.c 138
+                           2587 ;	goop.c 137
                            2588 ;	genAssign
                            2589 ;	AOP_HL for _game_score
    089A 21 0F 00           2590 	ld	hl,#_game_score
    089D 36 00              2591 	ld	(hl),#0x00
    089F 23                 2592 	inc	hl
    08A0 36 00              2593 	ld	(hl),#0x00
-                           2594 ;	goop.c 139
+                           2594 ;	goop.c 138
                            2595 ;	genAssign
                            2596 ;	AOP_HL for _game_started
    08A2 21 09 00           2597 	ld	hl,#_game_started
    08A5 36 00              2598 	ld	(hl),#0x00
    08A7 23                 2599 	inc	hl
    08A8 36 00              2600 	ld	(hl),#0x00
-                           2601 ;	goop.c 140
+                           2601 ;	goop.c 139
                            2602 ;	genAssign
                            2603 ;	AOP_HL for _game_over
    08AA 21 0B 00           2604 	ld	hl,#_game_over
    08AD 36 00              2605 	ld	(hl),#0x00
    08AF 23                 2606 	inc	hl
    08B0 36 00              2607 	ld	(hl),#0x00
-                           2608 ;	goop.c 141
+                           2608 ;	goop.c 140
                            2609 ;	genAssign
                            2610 ;	AOP_HL for _current_level
    08B2 21 0D 00           2611 	ld	hl,#_current_level
    08B5 36 00              2612 	ld	(hl),#0x00
    08B7 23                 2613 	inc	hl
    08B8 36 00              2614 	ld	(hl),#0x00
-                           2615 ;	goop.c 142
+                           2615 ;	goop.c 141
                            2616 ;	genAssign
                            2617 ;	AOP_HL for _INITIAL_LIVES
                            2618 ;	AOP_HL for _lives
@@ -2628,7 +2628,7 @@
                            2628 	
    08C4 C9                 2629 	ret
    08C5                    2630 ___state_game_restart_end:
-                           2631 ;	goop.c 149
+                           2631 ;	goop.c 148
                            2632 ;	genLabel
                            2633 ;	genFunction
                            2634 ;	---------------------------------
@@ -2637,10 +2637,10 @@
    08C5                    2637 ___run_start:
    08C5                    2638 _run:
    08C5 E8 FD              2639 	lda	sp,-3(sp)
-                           2640 ;	goop.c 152
+                           2640 ;	goop.c 151
                            2641 ;	genLabel
    08C7                    2642 00109$:
-                           2643 ;	goop.c 154
+                           2643 ;	goop.c 153
                            2644 ;	genAssign
                            2645 ;	AOP_HL for _FRAME_RATE
    08C7 21 D1 04           2646 	ld	hl,#_FRAME_RATE
@@ -2650,7 +2650,7 @@
                            2650 ;	genCmpEq
                            2651 ;	AOP_HL for _frames
                            2652 ; genCmpEq: left 2, right 2, result 0
-   08CD 21 11 00           2653 	ld	hl,#_frames
+   08CD 21 15 00           2653 	ld	hl,#_frames
    08D0 7E                 2654 	ld	a,(hl)
    08D1 B9                 2655 	cp	c
    08D2 C2 DD 08           2656 	jp	nz,00117$
@@ -2662,18 +2662,18 @@
    08DD                    2662 00117$:
    08DD C3 F0 08           2663 	jp	00102$
    08E0                    2664 00118$:
-                           2665 ;	goop.c 156
+                           2665 ;	goop.c 155
                            2666 ;	genAssign
                            2667 ;	AOP_HL for _frames
-   08E0 21 11 00           2668 	ld	hl,#_frames
+   08E0 21 15 00           2668 	ld	hl,#_frames
    08E3 36 00              2669 	ld	(hl),#0x00
    08E5 23                 2670 	inc	hl
    08E6 36 00              2671 	ld	(hl),#0x00
-                           2672 ;	goop.c 157
+                           2672 ;	goop.c 156
                            2673 ;	genPlus
                            2674 ;	AOP_HL for _seconds
                            2675 ;	genPlusIncr
-   08E8 21 13 00           2676 	ld	hl,#_seconds
+   08E8 21 17 00           2676 	ld	hl,#_seconds
    08EB 34                 2677 	inc	(hl)
    08EC 20 02              2678 	jr	nz,00119$
    08EE 23                 2679 	inc	hl
@@ -2681,51 +2681,51 @@
    08F0                    2681 00119$:
                            2682 ;	genLabel
    08F0                    2683 00102$:
-                           2684 ;	goop.c 160
+                           2684 ;	goop.c 159
                            2685 ;	genCall
                            2686 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
    08F0 CD 00 00           2687 	call	_wait_vbl_done
-                           2688 ;	goop.c 162
+                           2688 ;	goop.c 161
                            2689 ;	genCall
                            2690 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
    08F3 CD 00 00           2691 	call	_joypad
                            2692 ;	AOP_HL for _key
    08F6 21 06 00           2693 	ld	hl,#_key
    08F9 73                 2694 	ld	(hl),e
-                           2695 ;	goop.c 164
+                           2695 ;	goop.c 163
                            2696 ;	genCall
                            2697 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
    08FA CD D0 05           2698 	call	_input
-                           2699 ;	goop.c 165
+                           2699 ;	goop.c 164
                            2700 ;	genIfx
                            2701 ;	AOP_HL for _game_over
    08FD 21 0B 00           2702 	ld	hl,#_game_over
    0900 2A                 2703 	ld	a,(hl+)
    0901 B6                 2704 	or	a,(hl)
    0902 C2 14 09           2705 	jp	nz,00104$
-                           2706 ;	goop.c 166
+                           2706 ;	goop.c 165
                            2707 ;	genCall
                            2708 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
    0905 CD B4 06           2709 	call	_physics
-                           2710 ;	goop.c 167
+                           2710 ;	goop.c 166
                            2711 ;	genCall
                            2712 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
    0908 CD FF 06           2713 	call	_collide
-                           2714 ;	goop.c 168
+                           2714 ;	goop.c 167
                            2715 ;	genCall
                            2716 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
    090B CD 00 07           2717 	call	_move
-                           2718 ;	goop.c 169
+                           2718 ;	goop.c 168
                            2719 ;	genCall
                            2720 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
    090E CD 3E 07           2721 	call	_score
-                           2722 ;	goop.c 170
+                           2722 ;	goop.c 169
                            2723 ;	genCall
                            2724 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
    0911 CD 3F 07           2725 	call	_render_score
                            2726 ;	genLabel
    0914                    2727 00104$:
-                           2728 ;	goop.c 173
+                           2728 ;	goop.c 172
                            2729 ;	genAssign
    0914 01 40 FF           2730 	ld	bc,#0xFF40
                            2731 ;	genAssign
@@ -2751,14 +2751,14 @@
    0926 F6 01              2751 	or	a,#0x01
                            2752 ;	genAssign (pointer)
    0928 02                 2753 	ld	(bc),a
-                           2754 ;	goop.c 174
+                           2754 ;	goop.c 173
                            2755 ;	genIfx
                            2756 ;	AOP_HL for _game_over
    0929 21 0B 00           2757 	ld	hl,#_game_over
    092C 2A                 2758 	ld	a,(hl+)
    092D B6                 2759 	or	a,(hl)
    092E CA 49 09           2760 	jp	z,00106$
-                           2761 ;	goop.c 175
+                           2761 ;	goop.c 174
                            2762 ;	genAssign
    0931 01 40 FF           2763 	ld	bc,#0xFF40
                            2764 ;	genAssign
@@ -2788,7 +2788,7 @@
    0946 C3 C7 08           2788 	jp	00109$
                            2789 ;	genLabel
    0949                    2790 00106$:
-                           2791 ;	goop.c 177
+                           2791 ;	goop.c 176
                            2792 ;	genAssign
    0949 01 40 FF           2793 	ld	bc,#0xFF40
                            2794 ;	genAssign
@@ -2822,7 +2822,7 @@
    0961 E8 03              2822 	lda	sp,3(sp)
    0963 C9                 2823 	ret
    0964                    2824 ___run_end:
-                           2825 ;	goop.c 182
+                           2825 ;	goop.c 181
                            2826 ;	genLabel
                            2827 ;	genFunction
                            2828 ;	---------------------------------
@@ -2831,7 +2831,7 @@
    0964                    2831 ___main_start:
    0964                    2832 _main:
    0964 E8 FD              2833 	lda	sp,-3(sp)
-                           2834 ;	goop.c 184
+                           2834 ;	goop.c 183
                            2835 ;	genAssign
    0966 01 40 FF           2836 	ld	bc,#0xFF40
                            2837 ;	genAssign
@@ -2857,11 +2857,11 @@
    0979 F6 04              2857 	or	a,#0x04
                            2858 ;	genAssign (pointer)
    097B 02                 2859 	ld	(bc),a
-                           2860 ;	goop.c 185
+                           2860 ;	goop.c 184
                            2861 ;	genCall
                            2862 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
    097C CD 74 08           2863 	call	_state_game_init
-                           2864 ;	goop.c 186
+                           2864 ;	goop.c 185
                            2865 ;	genCall
                            2866 ; _saveRegsForCall: sendSetSize: 0 deInUse: 0 bcInUse: 0 deSending: 0
    097F CD C5 08           2867 	call	_run
@@ -2899,8 +2899,8 @@ Symbol Table
   0 ___run_start                       08C5 R
   0 ___score_end                       073F R
   0 ___score_start                     073E R
-  0 ___set_paddle_end                  05D0 R
-  0 ___set_paddle_start                04DB R
+  0 ___set_goop_end                    05D0 R
+  0 ___set_goop_start                  04DB R
   0 ___state_game_init_end             089A R
   0 ___state_game_init_start           0874 R
   0 ___state_game_over_end             0874 R
@@ -2914,10 +2914,16 @@ Symbol Table
   0 _blank_screen                      031F GR
   0 _collide                           06FF GR
   1 _current_level                     000D GR
-  1 _frames                            0011 GR
+  1 _frames                            0015 GR
   1 _game_over                         000B GR
   1 _game_score                        000F GR
+  1 _game_score_array                  0011 GR
   1 _game_started                      0009 GR
+  1 _goop_coords                       0019 GR
+  0 _goop_speed                        04D9 GR
+  0 _goop_sprite_data                  0491 GR
+  0 _goop_sprites                      04D5 GR
+  1 _goop_vel                          001B GR
   0 _input                             05D0 GR
     _joypad                            **** GX
   1 _key                               0006 GR
@@ -2926,21 +2932,15 @@ Symbol Table
   0 _move                              0700 GR
     _move_sprite                       **** GX
   0 _numbers                           0487 GR
-  1 _paddle_coords                     0015 GR
-  0 _paddle_speed                      04D9 GR
-  0 _paddle_sprite_data                0491 GR
-  0 _paddle_sprites                    04D5 GR
-  1 _paddle_vel                        0017 GR
   0 _physics                           06B4 GR
   0 _render_background                 0000 GR
   0 _render_score                      073F GR
   0 _run                               08C5 GR
   0 _score                             073E GR
-  1 _score_array                       0019 GR
-  1 _seconds                           0013 GR
+  1 _seconds                           0017 GR
     _set_bkg_data                      **** GX
     _set_bkg_tiles                     **** GX
-  0 _set_paddle                        04DB GR
+  0 _set_goop                          04DB GR
     _set_sprite_data                   **** GX
     _set_sprite_tile                   **** GX
   0 _state_game_init                   0874 GR

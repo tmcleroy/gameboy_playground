@@ -50,12 +50,12 @@ AREA _CODE
 		_alpha	021F
 		_blank_screen	051F
 		_numbers	0687
-		_paddle_sprite_data	0691
+		_goop_sprite_data	0691
 		_FRAME_RATE	06D1
 		_INITIAL_LIVES	06D3
-		_paddle_sprites	06D5
-		_paddle_speed	06D9
-		_set_paddle	06DB
+		_goop_sprites	06D5
+		_goop_speed	06D9
+		_set_goop	06DB
 		_input	07D0
 		_physics	08B4
 		_collide	08FF
@@ -207,11 +207,11 @@ AREA _DATA
 		_game_over	C0AB
 		_current_level	C0AD
 		_game_score	C0AF
-		_frames	C0B1
-		_seconds	C0B3
-		_paddle_coords	C0B5
-		_paddle_vel	C0B7
-		_score_array	C0B9
+		_game_score_array	C0B1
+		_frames	C0B5
+		_seconds	C0B7
+		_goop_coords	C0B9
+		_goop_vel	C0BB
 AREA _BSS
 	RADIX HEX
 	BASE C0BD
@@ -263,7 +263,7 @@ MODULES
 	FILE /opt/gbdk/lib/small/asxxxx/gb/crt0.o
 		NAME Runtime
 	FILE goop.o
-		NAME lcc69300
+		NAME lcc70650
 LIBRARIES
 	LIBRARY /opt/gbdk/lib/small/asxxxx/gbz80/gbz80.lib
 		MODULE crt0_rle.o

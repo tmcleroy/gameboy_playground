@@ -25,12 +25,12 @@
 00:021F _alpha
 00:051F _blank_screen
 00:0687 _numbers
-00:0691 _paddle_sprite_data
+00:0691 _goop_sprite_data
 00:06D1 _FRAME_RATE
 00:06D3 _INITIAL_LIVES
-00:06D5 _paddle_sprites
-00:06D9 _paddle_speed
-00:06DB _set_paddle
+00:06D5 _goop_sprites
+00:06D9 _goop_speed
+00:06DB _set_goop
 00:07D0 _input
 00:08B4 _physics
 00:08FF _collide
@@ -145,11 +145,11 @@
 00:C0AB _game_over
 00:C0AD _current_level
 00:C0AF _game_score
-00:C0B1 _frames
-00:C0B3 _seconds
-00:C0B5 _paddle_coords
-00:C0B7 _paddle_vel
-00:C0B9 _score_array
+00:C0B1 _game_score_array
+00:C0B5 _frames
+00:C0B7 _seconds
+00:C0B9 _goop_coords
+00:C0BB _goop_vel
 ; Area: _BSS
 00:C0BD __cpu
 00:C0BE .mode

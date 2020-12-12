@@ -22,18 +22,17 @@ int game_started = 0;
 int game_over = 0;
 int current_level = 0;
 int game_score = 0;
+unsigned char game_score_array[] = { 0x30, 0x30, 0x30, 0x30 };
 // frames elapsed, reset every 60 frames
 int frames = 0;
 // seconds elapsed, never reset
 int seconds = 0;
 
-UBYTE paddle_coords[] = {0, 0};
-UBYTE paddle_vel[] = {0, 0};
-const int paddle_sprites[] = {0, 1};
-const int paddle_speed = 3;
-
-
-unsigned char score_array[] = { 0x30, 0x30, 0x30, 0x30 };
+// goop
+UBYTE goop_coords[] = {0, 0};
+UBYTE goop_vel[] = {0, 0};
+const int goop_sprites[] = {0, 1};
+const int goop_speed = 3;
 
 void render_background()
 {
@@ -43,33 +42,33 @@ void render_background()
   set_bkg_tiles(0, 0, 20, 18, blank_screen);
 }
 
-void set_paddle()
+void set_goop()
 {
-  paddle_coords[0] = SCREEN_WIDTH / 2;
-  paddle_coords[1] = SCREEN_HEIGHT - 1;
+  goop_coords[0] = SCREEN_WIDTH / 2;
+  goop_coords[1] = SCREEN_HEIGHT - 1;
 
-  set_sprite_data(0, 8, paddle_sprite_data);
-  set_sprite_tile(paddle_sprites[0], 0);
-  set_sprite_tile(paddle_sprites[1], 2);
-  move_sprite(paddle_sprites[0], paddle_coords[0], paddle_coords[1]);
-  move_sprite(paddle_sprites[1], paddle_coords[0] + (SPRITE_SIZE/2), paddle_coords[1]);
+  set_sprite_data(0, 8, goop_sprite_data);
+  set_sprite_tile(goop_sprites[0], 0);
+  set_sprite_tile(goop_sprites[1], 2);
+  move_sprite(goop_sprites[0], goop_coords[0], goop_coords[1]);
+  move_sprite(goop_sprites[1], goop_coords[0] + (SPRITE_SIZE/2), goop_coords[1]);
 }
 
 void input()
 {
-  // paddle movement
+  // goop movement
   if(key & (J_LEFT|J_RIGHT|J_UP|J_DOWN)) {
-    if(key & J_LEFT && paddle_coords[0] > 0) {
-      paddle_vel[0] = -1 * paddle_speed;
+    if(key & J_LEFT && goop_coords[0] > 0) {
+      goop_vel[0] = -1 * goop_speed;
     }
-    if(key & J_RIGHT && paddle_coords[0] < SCREEN_WIDTH) {
-      paddle_vel[0] = 1 * paddle_speed;
+    if(key & J_RIGHT && goop_coords[0] < SCREEN_WIDTH) {
+      goop_vel[0] = 1 * goop_speed;
     }
     if(key & J_UP) {
-      paddle_vel[1] = -1 * paddle_speed;
+      goop_vel[1] = -1 * goop_speed;
     }
     if(key & J_DOWN) {
-      paddle_vel[1] = 1 * paddle_speed;
+      goop_vel[1] = 1 * goop_speed;
     }
   }
 
@@ -79,12 +78,12 @@ void input()
 
 void physics()
 {
-  // paddle
+  // goop
   if(key & (J_LEFT|J_RIGHT)) {
-    paddle_coords[0]+=paddle_vel[0];
+    goop_coords[0]+=goop_vel[0];
   }
   if(key & (J_UP|J_DOWN)) {
-    paddle_coords[1]+=paddle_vel[1];
+    goop_coords[1]+=goop_vel[1];
   }
 }
 
@@ -92,9 +91,9 @@ void collide() {
 }
 
 void move() {
-  // paddle
-  move_sprite(0, paddle_coords[0], paddle_coords[1]);
-  move_sprite(1, paddle_coords[0] + 8, paddle_coords[1]);
+  // goop
+  move_sprite(0, goop_coords[0], goop_coords[1]);
+  move_sprite(1, goop_coords[0] + 8, goop_coords[1]);
 }
 
 void score() {
@@ -103,10 +102,10 @@ void score() {
 void render_score() {
     if (frames % (FRAME_RATE / 2) == 0) {
   // only render score every half second
-    score_array[0] = numbers[(game_score / 1000) % 10]; // thousands
-    score_array[1] = numbers[(game_score / 100) % 10]; // hundreds
-    score_array[2] = numbers[(game_score / 10) % 10]; // tens
-    score_array[3] = numbers[game_score % 10]; // ones
+    game_score_array[0] = numbers[(game_score / 1000) % 10]; // thousands
+    game_score_array[1] = numbers[(game_score / 100) % 10]; // hundreds
+    game_score_array[2] = numbers[(game_score / 10) % 10]; // tens
+    game_score_array[3] = numbers[game_score % 10]; // ones
   }
 
   // write the score
@@ -115,7 +114,7 @@ void render_score() {
     0, // yrow
     4, // num tiles width (columns)
     1, // num tiles height (rows)
-    score_array
+    game_score_array
   );
 }
 
@@ -130,7 +129,7 @@ void state_game_over() {
 
 void state_game_init() {
   game_over = 0;
-  set_paddle();
+  set_goop();
   SHOW_SPRITES;
 }
 
