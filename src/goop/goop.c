@@ -45,12 +45,36 @@ void render_background()
   set_bkg_tiles(0, 0, 20, 18, blank_screen);
 }
 
-void set_goop()
+void set_goop_sprite() {
+  if (left_wall_occupied) {
+    set_sprite_data(0, 8, goop_left_sprite_data);
+    return;
+  }
+  if (right_wall_occupied) {
+    set_sprite_data(0, 8, goop_right_sprite_data);
+    return;
+  }
+  if (top_wall_occupied) {
+    set_sprite_data(0, 8, goop_top_sprite_data);
+    return;
+  }
+  if (bottom_wall_occupied) {
+    set_sprite_data(0, 8, goop_bottom_sprite_data);
+    return;
+  }
+  set_sprite_data(0, 8, goop_neutral_sprite_data);
+}
+
+void update_sprites() {
+  set_goop_sprite();
+}
+
+void init_goop()
 {
   goop_coords[0] = SCREEN_WIDTH / 2;
   goop_coords[1] = SCREEN_HEIGHT / 2;
 
-  set_sprite_data(0, 8, goop_sprite_data);
+  set_sprite_data(0, 8, goop_neutral_sprite_data);
   set_sprite_tile(goop_sprites[0], 0);
   set_sprite_tile(goop_sprites[1], 2);
   move_sprite(goop_sprites[0], goop_coords[0], goop_coords[1]);
@@ -127,6 +151,7 @@ void collide() {
   }
 }
 
+
 void move() {
   // goop
   move_sprite(goop_sprites[0], goop_coords[0], goop_coords[1]);
@@ -144,17 +169,12 @@ void state_game_over() {
 
 void state_game_init() {
   game_over = 0;
-  set_goop();
+  init_goop();
   SHOW_SPRITES;
 }
 
-//
-// GAME LOOP
-//
-
 void run()
 {
-  // game loop
   while(1) {
 
     if (frames == FRAME_RATE) {
@@ -172,6 +192,7 @@ void run()
       physics();
       move();
       collide();
+      update_sprites();
     }
 
     SHOW_BKG;
