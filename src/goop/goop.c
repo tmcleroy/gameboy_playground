@@ -20,9 +20,6 @@ UBYTE key;
 int lives = INITIAL_LIVES;
 int game_started = 0;
 int game_over = 0;
-int current_level = 0;
-int game_score = 0;
-unsigned char game_score_array[] = { 0x30, 0x30, 0x30, 0x30 };
 // frames elapsed, reset every 60 frames
 int frames = 0;
 // seconds elapsed, never reset
@@ -92,30 +89,8 @@ void collide() {
 
 void move() {
   // goop
-  move_sprite(0, goop_coords[0], goop_coords[1]);
-  move_sprite(1, goop_coords[0] + 8, goop_coords[1]);
-}
-
-void score() {
-}
-
-void render_score() {
-    if (frames % (FRAME_RATE / 2) == 0) {
-  // only render score every half second
-    game_score_array[0] = numbers[(game_score / 1000) % 10]; // thousands
-    game_score_array[1] = numbers[(game_score / 100) % 10]; // hundreds
-    game_score_array[2] = numbers[(game_score / 10) % 10]; // tens
-    game_score_array[3] = numbers[game_score % 10]; // ones
-  }
-
-  // write the score
-  set_bkg_tiles(
-    16, // xrow
-    0, // yrow
-    4, // num tiles width (columns)
-    1, // num tiles height (rows)
-    game_score_array
-  );
+  move_sprite(goop_sprites[0], goop_coords[0], goop_coords[1]);
+  move_sprite(goop_sprites[1], goop_coords[0] + 8, goop_coords[1]);
 }
 
 //
@@ -131,14 +106,6 @@ void state_game_init() {
   game_over = 0;
   set_goop();
   SHOW_SPRITES;
-}
-
-void state_game_restart(){
-  game_score = 0;
-  game_started = 0;
-  game_over = 0;
-  current_level = 0;
-  lives = INITIAL_LIVES;
 }
 
 //
@@ -165,8 +132,6 @@ void run()
       physics();
       collide();
       move();
-      score();
-      render_score();
     }
 
     SHOW_BKG;
