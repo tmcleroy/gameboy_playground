@@ -45,36 +45,12 @@ void render_background()
   set_bkg_tiles(0, 0, 20, 18, blank_screen);
 }
 
-void set_goop_sprite() {
-  if (left_wall_occupied) {
-    set_sprite_data(0, 8, goop_left_sprite_data);
-    return;
-  }
-  if (right_wall_occupied) {
-    set_sprite_data(0, 8, goop_right_sprite_data);
-    return;
-  }
-  if (top_wall_occupied) {
-    set_sprite_data(0, 8, goop_top_sprite_data);
-    return;
-  }
-  if (bottom_wall_occupied) {
-    set_sprite_data(0, 8, goop_bottom_sprite_data);
-    return;
-  }
-  set_sprite_data(0, 8, goop_neutral_sprite_data);
-}
-
-void update_sprites() {
-  set_goop_sprite();
-}
-
 void init_goop()
 {
   goop_coords[0] = SCREEN_WIDTH / 2;
   goop_coords[1] = SCREEN_HEIGHT / 2;
 
-  set_sprite_data(0, 8, goop_neutral_sprite_data);
+  set_sprite_data(0, 8, goop_neutral_sprites[0]);
   set_sprite_tile(goop_sprites[0], 0);
   set_sprite_tile(goop_sprites[1], 2);
   move_sprite(goop_sprites[0], goop_coords[0], goop_coords[1]);
@@ -97,9 +73,6 @@ void input()
     if(key & J_DOWN && !bottom_wall_occupied) {
       goop_vel[1] = 1 * goop_speed;
     }
-  }
-
-  if(key & J_A) {
   }
 }
 
@@ -158,6 +131,41 @@ void move() {
   move_sprite(goop_sprites[1], goop_coords[0] + 8, goop_coords[1]);
 }
 
+void animate() {
+  unsigned int neutral =
+    !left_wall_occupied && !right_wall_occupied && !top_wall_occupied && !bottom_wall_occupied;
+
+  if (neutral) {
+    if (frames <= 15) {
+      set_sprite_data(0, 8, goop_neutral_sprites[0]);
+    } else if (frames <= 30) {
+      set_sprite_data(0, 8, goop_neutral_sprites[1]);
+    } else if (frames <= 45) {
+      set_sprite_data(0, 8, goop_neutral_sprites[2]);
+    } else if (frames <= 60) {
+      set_sprite_data(0, 8, goop_neutral_sprites[3]);
+    }
+    return;
+  } else {
+    if (left_wall_occupied) {
+      set_sprite_data(0, 8, goop_left_sprite_data);
+      return;
+    }
+    if (right_wall_occupied) {
+      set_sprite_data(0, 8, goop_right_sprite_data);
+      return;
+    }
+    if (top_wall_occupied) {
+      set_sprite_data(0, 8, goop_top_sprite_data);
+      return;
+    }
+    if (bottom_wall_occupied) {
+      set_sprite_data(0, 8, goop_bottom_sprite_data);
+      return;
+    }
+  }
+}
+
 //
 // GAME STATE
 //
@@ -177,8 +185,8 @@ void run()
 {
   while(1) {
 
-    if (frames == FRAME_RATE) {
     frames++;
+    if (frames == FRAME_RATE) {
       frames = 0;
       seconds++;
     }
@@ -192,7 +200,7 @@ void run()
       physics();
       move();
       collide();
-      update_sprites();
+      animate();
     }
 
     SHOW_BKG;
